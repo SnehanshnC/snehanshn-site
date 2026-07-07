@@ -17,11 +17,11 @@ export default function Nav() {
     <header className="border-b border-line">
       <nav
         aria-label="Main"
-        className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-4 sm:px-8"
+        className="mx-auto flex max-w-6xl items-center justify-between gap-[16px] px-[20px] py-4 sm:px-[32px]"
       >
         <Link
           href="/"
-          className="group flex min-h-11 items-baseline gap-3"
+          className="group flex min-h-[44px] items-baseline gap-[12px]"
           data-cursor={identity.latencyJoke}
         >
           <span className="font-mono text-[13px] font-medium tracking-[0.08em] uppercase">
@@ -32,7 +32,7 @@ export default function Nav() {
           </span>
         </Link>
 
-        <div className="flex items-center gap-1 sm:gap-2">
+        <div className="flex items-center gap-[4px] sm:gap-[8px]">
           {LINKS.map(({ href, label }) => {
             const active = pathname === href;
             return (
@@ -40,7 +40,7 @@ export default function Nav() {
                 key={href}
                 href={href}
                 aria-current={active ? "page" : undefined}
-                className={`flex min-h-11 items-center px-2.5 font-mono text-[13px] tracking-[0.08em] uppercase transition-colors duration-150 max-[359px]:px-1.5 sm:px-3 ${
+                className={`flex min-h-[44px] items-center px-[10px] font-mono text-[13px] tracking-[0.08em] uppercase transition-colors duration-150 max-[359px]:px-[6px] sm:px-[12px] ${
                   active ? "text-signal" : "text-faint hover:text-ink"
                 }`}
               >
@@ -53,7 +53,7 @@ export default function Nav() {
             aria-label="Open terminal"
             data-cursor="press /"
             onClick={() => window.dispatchEvent(new Event("terminal:open"))}
-            className="ml-1 flex min-h-11 min-w-11 items-center justify-center border border-line px-3 font-mono text-[13px] text-faint transition-colors duration-150 max-[359px]:ml-0 max-[359px]:px-2 hover:border-ink hover:text-ink"
+            className="ml-[4px] flex min-h-[44px] min-w-[44px] items-center justify-center border border-line px-[12px] font-mono text-[13px] text-faint transition-colors duration-150 max-[359px]:ml-0 max-[359px]:px-[8px] hover:border-ink hover:text-ink"
           >
             {">_"}
           </button>

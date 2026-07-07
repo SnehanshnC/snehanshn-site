@@ -98,6 +98,8 @@ Night-desk styling (surface/void/grid tokens, `--flare` prompt) - on the light s
 Fully keyboard operable: Tab completes commands and arguments (ambiguous → candidates printed), Enter runs, ArrowUp/Down recall history (persisted in `sessionStorage`), Escape or `exit` closes and focus returns to the pre-open element (`goto` skips the focus restore - the element belongs to the page being left).
 The input suppresses the global focus outline (`[data-terminal-input]` rule in globals.css); the amber prompt + caret carry focus. Command data all comes from `content.ts`.
 Body scroll is locked while the terminal is open (`overflow: hidden` effect on `open`; the output pane scrolls itself with `overscroll-contain`) - Escape must land you exactly where you pressed `/`.
+The output pane carries `role="log"` (implicit polite live region) so screen readers announce each command's echo and output as they are appended - keep it; without it the terminal is completely silent for SR users (WCAG 4.1.3).
+History recall stays quiet because ArrowUp only edits the input's value, never the log.
 
 ## Covers (`src/components/Cover.tsx`)
 
@@ -117,6 +119,8 @@ No animation libraries in initial-load components (framer-motion was removed for
 
 Lighthouse mobile on `/`: performance ≥95, accessibility ≥95 (re-check after any hero/font change - LCP is the h1 font swap).
 Zero console messages, hydration-clean, no horizontal scroll at 390px, all interactive elements ≥44px, focus outlines visible, full keyboard walk incl. terminal and nav across pages.
+Tap-target minimums (44px) and the nav row's paddings/gaps are authored in px, not rem, on purpose: the 44px floor is a physical-ergonomics constant, and rem-authored versions inflate under the browser's font-size setting (150/200% text scale) until the nav overflows 390px - keep new tap floors in px (`min-h-[44px]`), and keep the nav free of rem-based horizontal spacing.
+Text itself may scale; check `scrollWidth - clientWidth = 0` at 390px with CDP `Page.setFontSizes` standard 24 and 32 after touching the nav, footer, or wall tiles (`break-words` on the wall placement keeps /fun from overflowing at 200%).
 Reduced motion: pages render complete and static; cursor follows without trail.
 Print / save-as-PDF: no work card may straddle a page break - the `@media print` block in globals.css (`.work-card { break-inside: avoid }`) guarantees it; the SVG covers are monolithic so Chromium happens to push them whole anyway, but text can still split without the rule.
 Screenshots for review live under `docs/screenshots/` (all pages at 390/768/1440 + cursor states; print captures as `print-home-*.png`).

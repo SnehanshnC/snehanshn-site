@@ -20,7 +20,7 @@ export default function TerminalHint({
       title="open the terminal"
       data-cursor="press /"
       onClick={() => window.dispatchEvent(new Event("terminal:open"))}
-      className={`-my-3 inline-block min-h-11 min-w-11 content-center px-1 font-mono text-[12px] tracking-[0.1em] text-faint uppercase transition-colors duration-150 hover:text-ink ${className}`}
+      className={`-my-3 inline-block min-h-[44px] min-w-[44px] content-center px-1 font-mono text-[12px] tracking-[0.1em] text-faint uppercase transition-colors duration-150 hover:text-ink ${className}`}
     >
       {slash === -1 ? (
         label

@@ -357,7 +357,7 @@ export default function Terminal() {
           <button
             type="button"
             onClick={() => close()}
-            className="min-h-11 min-w-11 px-3 font-mono text-[11px] tracking-[0.14em] text-noise uppercase transition-colors duration-150 hover:text-flare"
+            className="min-h-[44px] min-w-[44px] px-3 font-mono text-[11px] tracking-[0.14em] text-noise uppercase transition-colors duration-150 hover:text-flare"
           >
             esc
           </button>
@@ -365,6 +365,7 @@ export default function Terminal() {
 
         <div
           ref={scrollRef}
+          role="log"
           className="flex-1 overflow-y-auto overscroll-contain px-4 py-3 font-mono text-[13px] leading-relaxed"
         >
           {lines.map((line, i) =>
