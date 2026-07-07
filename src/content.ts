@@ -30,16 +30,7 @@ export type Experience = {
 
 export const identity = {
   name: "Snehanshn Chowdhury",
-  /**
-   * Three hero one-liner candidates; the active one is `heroLine`.
-   * TODO(snehanshn): captain picks one of the three (see draft PR).
-   */
-  heroLineCandidates: [
-    "I build systems where milliseconds are the margin.",
-    "Real-time infrastructure for markets that don't wait.",
-    "I make markets legible at five gigabytes a second.",
-  ],
-  heroLine: "I build systems where milliseconds are the margin.",
+  heroLine: "Real-time infrastructure for markets that don't wait.",
   kicker: "Rutgers CS + Math · Founding engineer @ NovaFlow (YC S25)",
   // TODO(snehanshn): replace placeholder bio with your own two sentences.
   bio: "I spend most of my time on real-time systems: streaming Solana DEX data, catching arbitrage in milliseconds, and lately orchestrating agents over terabytes of genomics data. I like problems where the clock is the opponent.",
