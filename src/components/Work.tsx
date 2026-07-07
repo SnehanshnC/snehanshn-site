@@ -4,22 +4,32 @@ import Section from "./Section";
 export default function Work() {
   return (
     <Section id="work" index="01" title="Selected Work">
-      <ul className="divide-y divide-trace/50 border-y border-trace/50">
+      {/*
+       * Each row owns its top hairline (the row below supplies the bottom one),
+       * so a hovered row can warm both of its hairlines to signal/30 - the row
+       * lights the way a route lights during a pulse.
+       */}
+      <ul>
         {projects.map((project, i) => (
-          <li key={project.slug}>
+          <li
+            key={project.slug}
+            className="border-t border-trace/50 transition-colors duration-150 last:border-b hover:border-signal/30 [&:hover+li]:border-t-signal/30"
+          >
             <a
               href={project.link.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="group grid gap-x-8 gap-y-3 py-8 transition-colors duration-150 md:grid-cols-[3fr_4fr_auto] md:py-9"
+              className="group grid gap-x-8 gap-y-3 py-8 md:grid-cols-[3fr_4fr_auto] md:py-9"
             >
               <div>
                 <div className="flex flex-wrap items-baseline gap-x-3 gap-y-2">
+                  {/* Unpadded (vs the kicker's "01") so the two numbering
+                      systems don't read as one; noise/60 would fail AA. */}
                   <span
                     aria-hidden="true"
                     className="font-mono text-xs text-noise"
                   >
-                    {String(i + 1).padStart(2, "0")}
+                    {i + 1}
                   </span>
                   <h3 className="font-display text-xl font-semibold text-glow transition-colors duration-150 group-hover:text-signal">
                     {project.name}
@@ -42,7 +52,7 @@ export default function Work() {
                   </ul>
                 )}
               </div>
-              <div className="text-[15px] leading-relaxed text-noise">
+              <div className="text-[15px] leading-relaxed text-noise md:mt-[3px]">
                 <p>{project.description}</p>
                 {project.role && (
                   <p className="mt-2 font-mono text-xs text-noise">

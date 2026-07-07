@@ -43,6 +43,16 @@ body {
   border-radius: 2px;
 }
 
+/*
+ * The terminal input carries focus indication via the amber prompt and
+ * caret; a form-field outline inside the terminal breaks the illusion.
+ * (Focus is placed programmatically in a single-input modal, so no a11y
+ * loss.) Unlayered rule so it beats the utility layer's outline-none too.
+ */
+[data-terminal-input]:focus-visible {
+  outline: none;
+}
+
 /* Entrance reveal. CSS-driven so it resolves even where rAF is throttled. */
 @keyframes rise {
   from {
@@ -94,5 +104,36 @@ body {
   .rise-move,
   .terminal-in {
     animation: none;
+  }
+}
+
+/*
+ * Section-kicker underline: a 1px signal trace that draws in as the
+ * section scrolls into view (CSS scroll-driven animation, no JS).
+ * Static full-width underline where `animation-timeline` is unsupported
+ * or under reduced motion.
+ */
+@keyframes kicker-draw {
+  from {
+    width: 0;
+  }
+  to {
+    width: 2.5rem;
+  }
+}
+
+.kicker-line {
+  width: 2.5rem;
+  height: 1px;
+  background: var(--signal);
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .kicker-line {
+      animation: kicker-draw linear both;
+      animation-timeline: view();
+      animation-range: entry 10% entry 90%;
+    }
   }
 }

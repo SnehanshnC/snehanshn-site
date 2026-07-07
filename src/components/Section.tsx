@@ -17,6 +17,7 @@ export default function Section({
         </span>
         {title}
       </h2>
+      <div aria-hidden="true" className="kicker-line mt-3" />
       <div className="mt-10">{children}</div>
     </section>
   );

@@ -1,6 +1,10 @@
 import { contact, identity } from "@/content";
+import TerminalHint from "./TerminalHint";
 
-const links = [contact.github, contact.linkedin, contact.x, contact.email];
+/* Links still awaiting a real URL (`#todo` in content.ts) are not rendered. */
+const links = [contact.github, contact.linkedin, contact.x, contact.email].filter(
+  (link) => link.href !== "#todo"
+);
 
 export default function Footer() {
   return (
@@ -9,9 +13,11 @@ export default function Footer() {
         <ul className="-ml-2 flex flex-wrap gap-x-2 gap-y-1">
           {links.map((link) => (
             <li key={link.label}>
-              {/* TODO(snehanshn): real contact URLs live in content.ts */}
               <a
                 href={link.href}
+                {...(link.href.startsWith("http")
+                  ? { target: "_blank", rel: "noopener noreferrer" }
+                  : {})}
                 className="inline-block min-h-11 content-center px-2 py-2 font-mono text-xs text-noise transition-colors duration-150 hover:text-signal"
               >
                 {link.label}
@@ -20,8 +26,7 @@ export default function Footer() {
           ))}
         </ul>
         <p className="font-mono text-xs text-noise">
-          © {new Date().getFullYear()} {identity.name} ·{" "}
-          <span title="open the terminal">press / </span>
+          © 2026 {identity.name} · <TerminalHint />
         </p>
       </div>
     </footer>
