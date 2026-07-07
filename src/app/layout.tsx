@@ -3,9 +3,12 @@ import { Archivo, IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
 import { site } from "@/content";
 import "./globals.css";
 
+// Variable Archivo with the width axis: the display voice is Archivo
+// Expanded Black (125% / 900), set via the .signage class in globals.css.
 const archivo = Archivo({
   variable: "--font-archivo",
   subsets: ["latin"],
+  axes: ["wdth"],
 });
 
 const plexSans = IBM_Plex_Sans({

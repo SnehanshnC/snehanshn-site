@@ -110,7 +110,7 @@ function runCommand(raw: string): {
       if (arg === "projects" || arg === "") {
         return {
           output: projects
-            .map((p) => `${p.slug.padEnd(14)} ${p.tagline}`)
+            .map((p) => `${p.ticker.padEnd(6)} ${p.slug.padEnd(14)} ${p.tagline}`)
             .join("\n"),
         };
       }
@@ -324,16 +324,19 @@ export default function Terminal() {
         role="dialog"
         aria-modal="true"
         aria-label="Terminal"
-        className="terminal-in flex max-h-[70svh] w-full max-w-2xl flex-col overflow-hidden rounded-lg border border-trace bg-surface shadow-2xl shadow-void"
+        className="terminal-in flex max-h-[70svh] w-full max-w-2xl flex-col overflow-hidden border border-grid/70 bg-surface shadow-2xl shadow-void"
       >
-            <div className="flex items-center justify-between border-b border-trace/60 px-4 py-1">
-              <p className="font-mono text-xs text-noise">
-                snehanshn@site:~
+            <div className="flex items-center justify-between border-b border-grid/70 bg-void/40 px-4 py-1">
+              <p className="font-mono text-[11px] tracking-[0.14em] text-noise uppercase">
+                <span aria-hidden="true" className="text-signal">
+                  ▸
+                </span>{" "}
+                snehanshn@desk:~
               </p>
               <button
                 type="button"
                 onClick={close}
-                className="min-h-11 min-w-11 cursor-pointer rounded px-3 font-mono text-xs text-noise transition-colors duration-150 hover:text-signal"
+                className="min-h-11 min-w-11 cursor-pointer px-3 font-mono text-[11px] tracking-[0.14em] text-noise uppercase transition-colors duration-150 hover:text-signal"
               >
                 esc
               </button>
