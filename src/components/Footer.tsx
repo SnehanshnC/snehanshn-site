@@ -21,7 +21,7 @@ export default function Footer() {
               target="_blank"
               rel="noopener noreferrer"
               data-cursor={`${l.label.toLowerCase()} ↗`}
-              className="flex min-h-11 items-center font-mono text-[12px] tracking-[0.1em] text-faint uppercase transition-colors duration-150 hover:text-ink"
+              className="flex min-h-[44px] items-center font-mono text-[12px] tracking-[0.1em] text-faint uppercase transition-colors duration-150 hover:text-ink"
             >
               {l.label}
             </a>

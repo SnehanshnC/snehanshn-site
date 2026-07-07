@@ -52,7 +52,7 @@ export default function Fun() {
               key={`${w.detail}-${w.year}`}
               className="flex min-h-40 flex-col justify-between gap-6 bg-paper p-4 sm:p-5"
             >
-              <p className="statement text-[clamp(1.6rem,3vw,2.2rem)] leading-none">
+              <p className="statement break-words text-[clamp(1.6rem,3vw,2.2rem)] leading-none">
                 {w.placement}
               </p>
               <div>
