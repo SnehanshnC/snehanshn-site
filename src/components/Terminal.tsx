@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
 import { contact, identity, otherWins, projects } from "@/content";
 
 /*
@@ -56,7 +55,7 @@ function runCommand(raw: string): { output: string; url?: string; exit?: boolean
     case "cat":
       if (arg === "awards") {
         const cardAwards = projects
-          .flatMap((p) => p.awards.map((a) => `  ${a.full} — ${p.name}`))
+          .flatMap((p) => p.awards.map((a) => `  ${a.full} - ${p.name}`))
           .join("\n");
         return { output: `${cardAwards}\n${otherWins}` };
       }
@@ -68,7 +67,7 @@ function runCommand(raw: string): { output: string; url?: string; exit?: boolean
     case "sudo":
       if (arg === "hire-me") {
         return {
-          output: `[sudo] password accepted.\naccess granted: I start Mondays.\nemail: ${contact.email.href === "#todo" ? "pending — check back soon" : contact.email.href}`,
+          output: `[sudo] password accepted.\naccess granted: I start Mondays.\nemail: ${contact.email.href === "#todo" ? "pending - check back soon" : contact.email.href}`,
         };
       }
       return { output: `sudo: ${arg}: not in the sudoers file` };
@@ -105,7 +104,7 @@ export default function Terminal() {
         e.preventDefault();
         restoreFocusRef.current = document.activeElement as HTMLElement;
         setLines([
-          { kind: "output", text: "snehanshn.com — type help to begin" },
+          { kind: "output", text: "snehanshn.com - type help to begin" },
         ]);
         setValue("");
         setOpen(true);
@@ -171,29 +170,21 @@ export default function Terminal() {
     }
   };
 
+  if (!open) return null;
+
   return (
-    <AnimatePresence>
-      {open && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.15 }}
-          className="fixed inset-0 z-50 flex items-start justify-center bg-void/70 px-4 pt-[12svh] backdrop-blur-sm sm:px-6"
-          onMouseDown={(e) => {
-            if (e.target === e.currentTarget) close();
-          }}
-        >
-          <motion.div
-            initial={{ opacity: 0, y: -8, scale: 0.99 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -6, scale: 0.99 }}
-            transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
-            role="dialog"
-            aria-modal="true"
-            aria-label="Terminal"
-            className="flex max-h-[70svh] w-full max-w-2xl flex-col overflow-hidden rounded-lg border border-trace bg-surface shadow-2xl shadow-void"
-          >
+    <div
+      className="fixed inset-0 z-50 flex items-start justify-center bg-void/70 px-4 pt-[12svh] backdrop-blur-sm sm:px-6"
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget) close();
+      }}
+    >
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Terminal"
+        className="terminal-in flex max-h-[70svh] w-full max-w-2xl flex-col overflow-hidden rounded-lg border border-trace bg-surface shadow-2xl shadow-void"
+      >
             <div className="flex items-center justify-between border-b border-trace/60 px-4 py-2.5">
               <p className="font-mono text-xs text-noise">
                 snehanshn@site:~
@@ -248,9 +239,7 @@ export default function Terminal() {
                 placeholder="help"
               />
             </div>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+          </div>
+    </div>
   );
 }

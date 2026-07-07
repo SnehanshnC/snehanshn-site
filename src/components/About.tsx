@@ -4,7 +4,7 @@ import Section from "./Section";
 export default function About() {
   return (
     <Section id="about" index="02" title="About">
-      <div className="grid gap-x-16 gap-y-12 md:grid-cols-[4fr_5fr]">
+      <div className="grid gap-x-16 gap-y-12 lg:grid-cols-[4fr_5fr]">
         <div>
           <p className="max-w-prose text-[17px] leading-relaxed text-glow">
             {identity.bio}
@@ -28,7 +28,7 @@ export default function About() {
                   <p className="font-display text-lg font-semibold text-glow">
                     {job.company}
                   </p>
-                  <p className="font-mono text-xs text-noise/70">{job.period}</p>
+                  <p className="font-mono text-xs text-noise">{job.period}</p>
                 </div>
                 <p className="mt-1 text-sm text-noise">{job.role}</p>
                 <p className="mt-3 text-[15px] leading-relaxed text-noise">

@@ -6,7 +6,7 @@ import { useEffect, useRef } from "react";
  * The signature: a market-flow field drawn on raw canvas 2D.
  * Fine particles drift along curved routes between three unlabeled nodes;
  * every few seconds an arbitrage pulse traces a lit route in the accent
- * color and fades. Tuning parameters are documented in AGENTS.md — change
+ * color and fades. Tuning parameters are documented in AGENTS.md - change
  * them there and here together.
  */
 

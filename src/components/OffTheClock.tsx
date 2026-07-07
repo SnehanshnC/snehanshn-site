@@ -11,7 +11,7 @@ export default function OffTheClock() {
             className="flex aspect-square items-center justify-center rounded-md border border-dashed border-trace bg-surface/60"
           >
             {/* TODO(snehanshn): real photos replace these slots (see content.ts) */}
-            <span className="font-mono text-[11px] text-noise/60">
+            <span className="font-mono text-[11px] text-noise">
               {slot.alt}
             </span>
           </li>

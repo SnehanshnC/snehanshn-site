@@ -167,6 +167,6 @@ export const contact = {
 export const site = {
   title: "Snehanshn Chowdhury",
   description:
-    "Snehanshn Chowdhury — real-time systems engineer. Solana trading infrastructure, agent orchestration, and things that move in milliseconds.",
+    "Snehanshn Chowdhury - real-time systems engineer. Solana trading infrastructure, agent orchestration, and things that move in milliseconds.",
   url: "https://snehanshn.com",
 } as const;

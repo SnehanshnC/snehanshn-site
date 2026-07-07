@@ -11,7 +11,7 @@ export default function Hero() {
           {identity.kicker}
         </p>
 
-        <h1 className="rise mt-5 font-display text-5xl font-semibold leading-[1.02] tracking-tight text-glow sm:text-6xl md:text-7xl lg:text-8xl [animation-delay:300ms]">
+        <h1 className="rise-move mt-5 font-display text-5xl font-semibold leading-[1.02] tracking-tight text-glow sm:text-6xl md:text-7xl lg:text-8xl">
           Snehanshn
           <br />
           Chowdhury

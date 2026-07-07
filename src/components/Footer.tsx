@@ -19,7 +19,7 @@ export default function Footer() {
             </li>
           ))}
         </ul>
-        <p className="font-mono text-xs text-noise/60">
+        <p className="font-mono text-xs text-noise">
           © {new Date().getFullYear()} {identity.name} ·{" "}
           <span title="open the terminal">press / </span>
         </p>

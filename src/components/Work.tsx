@@ -17,7 +17,7 @@ export default function Work() {
                 <div className="flex flex-wrap items-baseline gap-x-3 gap-y-2">
                   <span
                     aria-hidden="true"
-                    className="font-mono text-xs text-noise/70"
+                    className="font-mono text-xs text-noise"
                   >
                     {String(i + 1).padStart(2, "0")}
                   </span>
@@ -45,7 +45,7 @@ export default function Work() {
               <div className="text-[15px] leading-relaxed text-noise">
                 <p>{project.description}</p>
                 {project.role && (
-                  <p className="mt-2 font-mono text-xs text-noise/70">
+                  <p className="mt-2 font-mono text-xs text-noise">
                     {project.role}
                   </p>
                 )}

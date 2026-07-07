@@ -1,17 +1,17 @@
 @import "tailwindcss";
 
 /*
- * Design tokens — the night-desk palette.
+ * Design tokens - the night-desk palette.
  * A blue-tinted dark (terminals after midnight), amber signal against
  * blue-gray noise. Six tokens, no more; see AGENTS.md before adding any.
  */
 :root {
-  --void: #0a0e16; /* page background — deep blue-black night */
+  --void: #0a0e16; /* page background - deep blue-black night */
   --surface: #101622; /* raised panels, terminal, cards */
   --trace: #2a3550; /* hairlines, particle paths, borders */
-  --noise: #8b93a7; /* secondary text — the noise floor */
-  --glow: #e8ecf4; /* primary text — cool near-white */
-  --signal: #f2a33c; /* the one accent — amber, market-terminal phosphor */
+  --noise: #8b93a7; /* secondary text - the noise floor */
+  --glow: #e8ecf4; /* primary text - cool near-white */
+  --signal: #f2a33c; /* the one accent - amber, market-terminal phosphor */
 }
 
 @theme inline {
@@ -59,8 +59,40 @@ body {
   animation: rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+/* Transform-only variant for the LCP element: it must paint immediately. */
+@keyframes rise-move {
+  from {
+    transform: translateY(14px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.rise-move {
+  animation: rise-move 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Terminal overlay entrance (CSS so no animation library ships in the bundle). */
+@keyframes terminal-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.terminal-in {
+  animation: terminal-in 0.18s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .rise {
+  .rise,
+  .rise-move,
+  .terminal-in {
     animation: none;
   }
 }

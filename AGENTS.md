@@ -40,7 +40,15 @@ Tuning constants live at the top of the file:
 
 Behavior contracts (do not regress): static frame under `prefers-reduced-motion`; a synchronous first frame is painted on resize so the canvas is never blank even where rAF stalls (headless screenshots); animation pauses when the tab is hidden or the canvas leaves the viewport.
 
-Entrance reveals use the CSS `.rise` keyframe in `globals.css`, not Framer Motion - rAF-driven entrance animations freeze at opacity 0 in headless capture environments (screenshots, Lighthouse). Framer Motion is reserved for interactive/scroll work.
+All animation is CSS (`.rise`, `.rise-move`, `.terminal-in` in `globals.css`) or raw canvas - two reasons: rAF-driven JS entrance animations freeze at opacity 0 in headless capture environments (screenshots, Lighthouse), and dropping framer-motion from the runtime cut ~97KiB of unused JS (Lighthouse mobile perf went 85 → 98). framer-motion stays in package.json for future interactive work; importing it in an initial-load component will regress TBT, so gate it behind interaction if ever used. The hero h1 uses `.rise-move` (transform-only, no fade) because it is the LCP element and must paint immediately.
+
+## The terminal (`src/components/Terminal.tsx`)
+
+Press `/` anywhere (footer hints at it). Commands: help, ls projects, open <slug>, cat awards, whoami, sudo hire-me, exit. Amber-on-surface using the site tokens, deliberately not green-on-black. Fully keyboard operable: Enter runs, ArrowUp/Down recall history, Escape or `exit` closes and focus returns to the pre-open element. Command data all comes from `content.ts`.
+
+## Verification
+
+`scratchpad` e2e (playwright) covered: hydration-clean console, terminal command flows, popup on `open`, history recall, focus restore, visible focus outlines, no horizontal scroll at 390px, 44px tap targets, reduced-motion static canvas frame. Lighthouse mobile: performance 98, accessibility 100. Keep those floors (>=95) when changing the hero or adding JS.
 
 ## Content
 
