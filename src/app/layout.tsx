@@ -1,19 +1,34 @@
 import type { Metadata } from "next";
-import { Archivo, IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
+import { Fraunces, IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
 import { site } from "@/content";
+import Nav from "@/components/Nav";
+import Footer from "@/components/Footer";
+import Cursor from "@/components/Cursor";
+import Terminal from "@/components/Terminal";
 import "./globals.css";
 
-// Variable Archivo with the width axis: the display voice is Archivo
-// Expanded Black (125% / 900), set via the .signage class in globals.css.
-const archivo = Archivo({
-  variable: "--font-archivo",
+// The statement voice: variable Fraunces, optical axis only - the SOFT
+// and WONK axes cost ~2x the font bytes and the h1 is the LCP element.
+// The italic (one emphasis word per page) is a separate, non-preloaded
+// family so its bytes never gate the h1's big repaint - see the LCP
+// contract in AGENTS.md.
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
   subsets: ["latin"],
-  axes: ["wdth"],
+  axes: ["opsz"],
+});
+
+const frauncesItalic = Fraunces({
+  variable: "--font-fraunces-italic",
+  subsets: ["latin"],
+  axes: ["opsz"],
+  style: ["italic"],
+  preload: false,
 });
 
 const plexSans = IBM_Plex_Sans({
   variable: "--font-plex-sans",
-  weight: ["400", "500", "600"],
+  weight: ["400", "500"],
   subsets: ["latin"],
 });
 
@@ -36,9 +51,15 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${archivo.variable} ${plexSans.variable} ${plexMono.variable} h-full antialiased`}
+      className={`${fraunces.variable} ${frauncesItalic.variable} ${plexSans.variable} ${plexMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="flex min-h-full flex-col">
+        <Nav />
+        <div className="flex-1">{children}</div>
+        <Footer />
+        <Terminal />
+        <Cursor />
+      </body>
     </html>
   );
 }

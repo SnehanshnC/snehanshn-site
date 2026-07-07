@@ -1,9 +1,9 @@
 "use client";
 
 /*
- * The "press /" hint (footer and hero), as a real button so the terminal
- * is reachable on touch devices (no keyboard, no `/`). Dispatches the
- * `terminal:open` event that Terminal listens for.
+ * The "press /" hint (footer + nav doorway), as a real button so the
+ * terminal is reachable on touch devices (no keyboard, no `/`).
+ * Dispatches the `terminal:open` event that Terminal listens for.
  */
 export default function TerminalHint({
   label = "press /",
@@ -12,15 +12,15 @@ export default function TerminalHint({
   label?: string;
   className?: string;
 }) {
-  /* The `/` alone carries the signal accent - the doorway glyph mirrors
-     the amber ▾ on "the book" without raising the label's volume. */
+  /* The `/` alone carries the accent - a doorway glyph, not a shout. */
   const slash = label.indexOf("/");
   return (
     <button
       type="button"
       title="open the terminal"
+      data-cursor="press /"
       onClick={() => window.dispatchEvent(new Event("terminal:open"))}
-      className={`-my-3 inline-block min-h-11 min-w-11 cursor-pointer content-center px-1 font-mono text-[11px] tracking-[0.14em] text-noise uppercase transition-colors duration-150 hover:text-signal ${className}`}
+      className={`-my-3 inline-block min-h-11 min-w-11 content-center px-1 font-mono text-[12px] tracking-[0.1em] text-faint uppercase transition-colors duration-150 hover:text-ink ${className}`}
     >
       {slash === -1 ? (
         label

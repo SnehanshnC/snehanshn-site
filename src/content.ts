@@ -5,43 +5,84 @@
  */
 
 export type Award = {
-  /** Short badge text rendered on a project card, e.g. "1st @ HackNYU" */
+  /** Short badge text rendered inline on a work card, e.g. "1st @ HackNYU" */
   badge: string;
   /** Full award name, used for accessibility / terminal output */
   full: string;
 };
 
+/** Abstract cover motif drawn by Cover.tsx - one per project, says what the thing does. */
+export type CoverMotif =
+  | "depth" // stepped depth-chart line (trading infra)
+  | "routes" // fan of routed arrows (application automation)
+  | "graph" // nodes and edges (knowledge graphs)
+  | "blocks" // parquet block grid (data marketplace)
+  | "wave" // speech waveform (speaking coach)
+  | "pulse"; // EKG line (field medic)
+
 export type Project = {
   slug: string;
-  /** 4-char instrument code for the positions book, e.g. "YUNO". */
+  /** 4-char instrument code - the market-desk whisper on cards and in the terminal. */
   ticker: string;
   name: string;
   tagline: string;
   description: string;
   role?: string;
-  /**
-   * The headline number for the row, set display-size.
-   * `fromAward: true` means the metric IS the placement, so the award tag
-   * is not rendered again on the row (no duplication).
-   */
+  /** Headline stat for the card metadata line. */
   metric: { value: string; label: string; fromAward?: boolean };
-  /** Secondary readouts rendered as a small stat strip under the metric. */
-  stats?: { label: string; value: string }[];
   awards: Award[];
   link: { label: string; href: string };
+  /**
+   * Cover hue (CSS hue degrees) + motif for the designed abstract cover.
+   * TODO(snehanshn): real screenshot per card - replace the generated
+   * cover by adding a `coverSrc` under /public and wiring it in WorkCard.
+   */
+  cover: { hue: number; motif: CoverMotif };
 };
 
 export type Experience = {
   company: string;
   role: string;
+  /** Year shown in the ledger column. */
+  year: string;
   period: string;
   summary: string;
+  /** Real URL only - rows without an href render as plain text. */
+  href?: string;
 };
 
 export const identity = {
   name: "Snehanshn Chowdhury",
-  heroLine: "Real-time infrastructure for markets that don't wait.",
+  /** One-word role next to the name in the nav. */
+  navRole: "engineer",
+  /**
+   * The statement hero. Rendered as pre + <em>emphasis</em> + post.
+   * Candidates considered:
+   *  1. "I'm Snehanshn. I build systems that don't *wait*."  <- chosen
+   *  2. "I'm Snehanshn. I like problems where the clock is the *opponent*."
+   *  3. "I'm Snehanshn. I move data faster than markets *blink*."
+   */
+  statement: {
+    pre: "I’m Snehanshn. I build systems that don’t ",
+    emphasis: "wait",
+    post: ".",
+  },
+  /** The latency joke the cursor tells over the hero name. */
+  latencyJoke: "~2ms",
+  /** /fun statement - one notch more playful. */
+  funStatement: {
+    pre: "Weekends go to hackathons. The record is ",
+    emphasis: "6-0",
+    post: ".",
+  },
+  /** /about statement. */
+  aboutStatement: {
+    pre: "I move data faster than markets ",
+    emphasis: "blink",
+    post: ".",
+  },
   kicker: "Rutgers CS + Math · Founding engineer @ NovaFlow (YC S25)",
+  heroLine: "Real-time infrastructure for markets that don't wait.",
   // TODO(snehanshn): replace placeholder bio with your own two sentences.
   bio: "I spend most of my time on real-time systems: streaming Solana DEX data, catching arbitrage in milliseconds, and lately orchestrating agents over terabytes of genomics data. I like problems where the clock is the opponent.",
   education: "Rutgers University · B.S. Computer Science & Mathematics",
@@ -54,16 +95,12 @@ export const projects: Project[] = [
     name: "Yuno Research",
     tagline: "Solana trading infrastructure",
     metric: { value: "5M+", label: "swaps/day" },
-    stats: [
-      { label: "ingest", value: "5GB/s" },
-      { label: "dex coverage", value: "~60%" },
-      { label: "team", value: "8" },
-    ],
     description:
       "On-chain prop desk streaming live gRPC data from Raydium, Orca, and Meteora to catch AMM arbitrage in milliseconds. Rust ingestion engine hitting 5GB/s disk saturation; 5M+ swaps processed daily across roughly 60% of DEX volume.",
     role: "Co-founder & lead infrastructure engineer, led an 8-person team",
     awards: [],
     link: { label: "GitHub", href: "https://github.com/yuno-research" },
+    cover: { hue: 226, motif: "depth" },
   },
   {
     slug: "algora",
@@ -73,10 +110,9 @@ export const projects: Project[] = [
     metric: { value: "+300%", label: "application throughput" },
     description:
       "Scrapes GitHub, LinkedIn, and job boards to build developer portfolios, match roles, and autofill applications. LLaMA-based skill extraction; +300% application throughput.",
-    awards: [
-      { badge: "1st @ HackNYU", full: "1st Place Overall @ HackNYU" },
-    ],
+    awards: [{ badge: "1st @ HackNYU", full: "1st Place Overall @ HackNYU" }],
     link: { label: "Devpost", href: "https://devpost.com/software/algora" },
+    cover: { hue: 174, motif: "routes" },
   },
   {
     slug: "synapse",
@@ -96,6 +132,7 @@ export const projects: Project[] = [
       label: "Devpost",
       href: "https://devpost.com/software/synapse-2bs4hv",
     },
+    cover: { hue: 262, motif: "graph" },
   },
   {
     slug: "quarry",
@@ -107,6 +144,7 @@ export const projects: Project[] = [
       "Schema-only marketplace where AI agents preview datasets through DuckDB queries and buy slices with Solana x402 micropayments. Parquet pipelines with IPFS verification.",
     awards: [],
     link: { label: "Live site", href: "https://www.quarry-ai.net/" },
+    cover: { hue: 96, motif: "blocks" },
   },
   {
     slug: "instructifai",
@@ -127,6 +165,7 @@ export const projects: Project[] = [
       },
     ],
     link: { label: "DoraHacks", href: "https://dorahacks.io/buidl/22372" },
+    cover: { hue: 340, motif: "wave" },
   },
   {
     slug: "medify",
@@ -146,41 +185,99 @@ export const projects: Project[] = [
         full: "3rd Place + Best Innovation in Emergency Medical AI @ HackNJIT 2024",
       },
     ],
-    link: { label: "Devpost", href: "https://devpost.com/software/medify-khoaid" },
+    link: {
+      label: "Devpost",
+      href: "https://devpost.com/software/medify-khoaid",
+    },
+    cover: { hue: 16, motif: "pulse" },
   },
 ];
 
-/** Wins without a project card: one understated line in About. */
+/** One line for the terminal's `cat awards` tail. */
 export const otherWins =
   "Also: xAI Hackathon Select (420 of 50,000), Jersey CTF Winner, Best Freshman Hack @ HackRU 2024 (FraxAI), 2nd Place @ Rutgers Road to Silicon Valley.";
+
+/** A win tile on the /fun hackathon wall. */
+export type Win = {
+  /** The placement, set display-size, e.g. "1st". */
+  placement: string;
+  /** What it was, mono line, e.g. "Overall @ HackNYU". */
+  detail: string;
+  /** Project or context line. */
+  context: string;
+  year: string;
+};
+
+/** The full trophy shelf for /fun - card awards plus the "other wins". */
+export const wins: Win[] = [
+  { placement: "1st", detail: "Overall @ HackNYU", context: "Algora", year: "2025" },
+  { placement: "1st", detail: "Education @ HackRU", context: "Synapse", year: "2025" },
+  {
+    placement: "2nd",
+    detail: "Education + Best Gen AI @ HackRU",
+    context: "InstructifAI",
+    year: "2025",
+  },
+  {
+    placement: "3rd",
+    detail: "+ Best EM-AI @ HackNJIT",
+    context: "Medify",
+    year: "2024",
+  },
+  {
+    placement: "420/50k",
+    detail: "xAI Hackathon Select",
+    context: "of 50,000 applicants",
+    year: "2025",
+  },
+  { placement: "W", detail: "Jersey CTF", context: "capture the flag", year: "2024" },
+  {
+    placement: "Best",
+    detail: "Freshman Hack @ HackRU",
+    context: "FraxAI",
+    year: "2024",
+  },
+  {
+    placement: "2nd",
+    detail: "Road to Silicon Valley",
+    context: "@ Rutgers",
+    year: "2024",
+  },
+];
 
 export const experience: Experience[] = [
   {
     company: "NovaFlow (YC S25)",
     role: "Machine Learning Intern",
+    year: "2025",
     period: "May 2025 – present",
     summary:
       "Architected the agent orchestration layer for an agentic bioinformatics platform. Code-as-context pattern running analyses over 1TB+ genomics data; Modal spot-GPU compute cutting inference cost ~70%.",
-  },
-  {
-    company: "Yuno Research",
-    role: "Co-founder & Lead Infrastructure Engineer",
-    period: "Aug 2024 – Jan 2026",
-    summary:
-      "Built and ran the on-chain prop desk: gRPC ingestion from three DEXes, Rust engine at 5GB/s, 5M+ swaps a day.",
+    // TODO(snehanshn): add the real NovaFlow URL when public.
   },
   {
     company: "Algora",
     role: "Software Engineering Intern",
+    year: "2025",
     period: "Feb 2025 – Jun 2025",
     summary:
       "Shipped LLaMA-based skill extraction and application autofill pipelines.",
+    // TODO(snehanshn): add the real Algora URL.
+  },
+  {
+    company: "Yuno Research",
+    role: "Co-founder & Lead Infrastructure Engineer",
+    year: "2024",
+    period: "Aug 2024 – Jan 2026",
+    summary:
+      "Built and ran the on-chain prop desk: gRPC ingestion from three DEXes, Rust engine at 5GB/s, 5M+ swaps a day.",
+    href: "https://github.com/yuno-research",
   },
 ];
 
 export type PhotoSlot = { alt: string; src?: string };
 
-/** Off the Clock: photo slots + currently ticker. Slots without `src` are not rendered. */
+/** /fun: photo slots + the currently line. Slots without `src` render as designed placeholders. */
 export const offTheClock = {
   // TODO(snehanshn): add real photos (src under /public, alt text) to light up the grid.
   photoSlots: [
@@ -190,63 +287,25 @@ export const offTheClock = {
     { alt: "Photo slot 4" },
   ] as PhotoSlot[],
   // TODO(snehanshn): keep this one line current.
-  currently: "Currently: shipping at NovaFlow and rereading Flash Boys.",
+  currently: "shipping at NovaFlow and rereading Flash Boys",
 };
-
-export type TapeInstrument = {
-  /** Instrument symbol on the tape, e.g. "SWAPS/DAY". */
-  symbol: string;
-  /** Static display for facts that don't tick, e.g. "6-0". */
-  text?: string;
-  /** Base value for ticking instruments; the seeded walk perturbs around it. */
-  base?: number;
-  decimals?: number;
-  prefix?: string;
-  suffix?: string;
-  /** Max walk deviation as a fraction of base. Absent/0 = static. */
-  vol?: number;
-  /**
-   * Cost-like instrument where DOWN is the win (e.g. GPU COST): the down
-   * move gets the amber marker. Everything else is up-is-good and never
-   * shows a downtick - achievements don't read as bad news.
-   */
-  winDown?: boolean;
-};
-
-/**
- * The tape: his real metrics streamed as instruments.
- * Ticking values walk around the true figures from the projects above;
- * static ones are facts that don't move.
- */
-export const tape: TapeInstrument[] = [
-  { symbol: "SWAPS/DAY", base: 5.21, decimals: 2, suffix: "M", vol: 0.014 },
-  { symbol: "INGEST", base: 5.08, decimals: 2, suffix: "GB/s", vol: 0.02 },
-  { symbol: "DEX COVERAGE", base: 60.2, decimals: 1, suffix: "%", vol: 0.008 },
-  { symbol: "HACKATHON W/L", text: "6-0" },
-  { symbol: "APP THROUGHPUT", text: "+300%" },
-  { symbol: "GENOMICS", base: 1.02, decimals: 2, suffix: "TB", vol: 0.012 },
-  {
-    symbol: "GPU COST",
-    base: 70,
-    decimals: 1,
-    prefix: "-",
-    suffix: "%",
-    vol: 0.006,
-    winDown: true,
-  },
-  { symbol: "DESK", text: "NOVAFLOW · YC S25" },
-  { symbol: "EDU", text: "RUTGERS CS+MATH" },
-];
 
 export type ContactLink = { label: string; href: string };
 
 /** Contact links. Links whose href is still `#todo` are not rendered. */
-export const contact: Record<"github" | "linkedin" | "x" | "email", ContactLink> = {
+export const contact: Record<
+  "github" | "linkedin" | "x" | "email",
+  ContactLink
+> = {
   github: { label: "GitHub", href: "https://github.com/SnehanshnC" },
   linkedin: { label: "LinkedIn", href: "#todo" }, // TODO(snehanshn)
   x: { label: "X", href: "#todo" }, // TODO(snehanshn)
   email: { label: "Email", href: "#todo" }, // TODO(snehanshn)
 };
+
+/** Footer sign-off, one line, first person. */
+// TODO(snehanshn): make this line yours.
+export const signOff = "Built by hand in New Jersey. Runs in milliseconds.";
 
 export const site = {
   title: "Snehanshn Chowdhury",
