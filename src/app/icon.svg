@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
+  <!-- The terminal doorway as the site's mark: ink square, flare-amber
+       prompt. The one dark moment of the site, legible at 16px. -->
+  <rect width="16" height="16" rx="3.5" fill="#211d16"/>
+  <!-- faint warm rim so the square doesn't melt into dark tab bars -->
+  <rect x="0.4" y="0.4" width="15.2" height="15.2" rx="3.2" fill="none" stroke="#faf8f3" stroke-opacity="0.1" stroke-width="0.8"/>
+  <path d="M4.25 5 L7.75 8 L4.25 11" fill="none" stroke="#f2a33c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="9.1" y="9.9" width="3.8" height="2.1" rx="0.65" fill="#faf8f3"/>
+</svg>

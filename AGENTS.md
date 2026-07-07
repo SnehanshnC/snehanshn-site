@@ -32,6 +32,15 @@ y=0 is restored too: with `scrollRestoration` forced to "manual", skipping it wo
 Positions are captured at user-intent time (capture-phase click/keydown on `document`), not inside the pushState wrapper, and scroll-driven saves are muted briefly after an intent save - the viewport can move programmatically between the user's action and pushState, which would clobber the saved value with 0.
 Fresh link navigations still start at top.
 Every page's h1 is a `.statement` sentence with ONE italic emphasis word (`<em>`, amber).
+`not-found.tsx` is the 404 in the same voice (statement + mono sub-line + link home); its emphasis word must be spellable from the italic subset's glyphs (currently ` -06abiklntw`) or it silently falls back to Georgia italic - "blank" is the current word.
+
+## The site's edges (favicon, unfurl, robots)
+
+The mark is the terminal doorway: `>_` in flare amber on an ink rounded square (`src/app/icon.svg`, hand-drawn geometry - no font text, it must stay crisp at 16px).
+`favicon.ico` (16/32/48, generated from the SVG) and `apple-icon.png` (180px, full-bleed ink because iOS rounds corners itself and would fill transparent ones with black) sit beside it; regenerate all three from icon.svg if the mark changes, and eyeball the 16px rendering on light AND dark tab strips.
+Unfurl contract: `layout.tsx` sets `metadataBase` off `site.url` plus openGraph/twitter; every page metadata export carries its own `alternates.canonical` and a COMPLETE `openGraph` object (Next replaces, never deep-merges it), including an explicit `images: ["/opengraph-image.png"]` - the root segment's `opengraph-image.png` file convention does not survive a page-level openGraph override.
+`opengraph-image.png` (1200x630) is the home statement ink-on-paper with the amber italic; rebuild it if the hero statement changes (it is a rendered composition, not a screenshot).
+`robots.ts` and `sitemap.ts` derive from `site.url`; new routes must be added to sitemap.ts by hand.
 
 ## Design tokens (the day-desk palette)
 
@@ -78,6 +87,7 @@ Rules (do not break):
 - Focus outlines are never hidden; the cursor is pointer-only garnish.
 - Reduced motion: the dot still follows (snap, no lerp) and morph transitions are disabled in globals.css.
 - Two-effect wiring: the first effect flips `active` so the pill renders; the second (dep `[active]`) attaches listeners once the element exists. Collapsing them back to one effect silently kills the whole system (the ref is null before the first render with `active`).
+- The rAF loop sleeps when settled (pos≈target, side≈sideGoal) instead of ticking forever on an idle tab; every input path (`onMove`, `applyMode`, press, release, resize) calls `wake()`. Any new code path that changes what `frame()` paints must call `wake()` too, or its change waits for the next pointer move.
 
 ## The terminal (`src/components/Terminal.tsx`)
 

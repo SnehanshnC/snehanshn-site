@@ -6,6 +6,18 @@ export const metadata: Metadata = {
   title: "Fun - Snehanshn Chowdhury",
   description:
     "Hackathon wins, photos, and what Snehanshn is up to off the clock.",
+  alternates: { canonical: "/fun" },
+  openGraph: {
+    title: "Fun - Snehanshn Chowdhury",
+    description:
+      "Hackathon wins, photos, and what Snehanshn is up to off the clock.",
+    url: "/fun",
+    siteName: "Snehanshn Chowdhury",
+    type: "website",
+    // The root segment's opengraph-image.png does not cascade past a page
+    // that declares its own openGraph object, so point at it explicitly.
+    images: [{ url: "/opengraph-image.png", width: 1200, height: 630 }],
+  },
 };
 
 /*

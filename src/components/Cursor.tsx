@@ -64,6 +64,7 @@ export default function Cursor() {
     let pressed = false;
     let raf = 0;
     let awake = false;
+    let running = false;
 
     const el = pillRef.current;
     const labelEl = labelRef.current;
@@ -86,6 +87,7 @@ export default function Cursor() {
         sideGoal = 0;
       }
       el.style.opacity = mode === "asleep" || !visible ? "0" : "1";
+      wake(); // width/sideGoal changed - the loop must run at least once
     };
 
     const readTarget = (t: Element | null) => {
@@ -128,6 +130,7 @@ export default function Cursor() {
         applyMode();
       }
       readTarget(e.target as Element);
+      wake();
     };
 
     const onOver = (e: PointerEvent) => readTarget(e.target as Element);
@@ -139,9 +142,11 @@ export default function Cursor() {
 
     const onDown = () => {
       pressed = true;
+      wake(); // scale change is painted by the loop
     };
     const onUp = () => {
       pressed = false;
+      wake();
     };
 
     const frame = () => {
@@ -162,11 +167,34 @@ export default function Cursor() {
       const y = Math.min(pos.y - h / 2, window.innerHeight - h - EDGE);
       const scale = pressed ? 0.86 : 1;
       el.style.transform = `translate3d(${x}px, ${y}px, 0) scale(${scale})`;
+      // Sleep when settled: once the lerp has caught up there is nothing
+      // left to animate, so stop re-queueing instead of ticking forever on
+      // an idle tab. Every input path below calls wake() to restart.
+      if (
+        Math.abs(target.x - pos.x) < 0.1 &&
+        Math.abs(target.y - pos.y) < 0.1 &&
+        Math.abs(sideGoal - side) < 0.01
+      ) {
+        pos.x = target.x;
+        pos.y = target.y;
+        side = sideGoal;
+        running = false;
+        return;
+      }
       raf = requestAnimationFrame(frame);
     };
 
+    const wake = () => {
+      if (running) return;
+      running = true;
+      raf = requestAnimationFrame(frame);
+    };
+
+    // Resize moves the viewport-edge clamps out from under a sleeping pill.
+    const onResize = () => wake();
+
     applyMode();
-    raf = requestAnimationFrame(frame);
+    window.addEventListener("resize", onResize);
     window.addEventListener("pointermove", onMove, { passive: true });
     window.addEventListener("pointerover", onOver, { passive: true });
     window.addEventListener("pointerdown", onDown, { passive: true });
@@ -175,6 +203,7 @@ export default function Cursor() {
 
     return () => {
       cancelAnimationFrame(raf);
+      window.removeEventListener("resize", onResize);
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerover", onOver);
       window.removeEventListener("pointerdown", onDown);
