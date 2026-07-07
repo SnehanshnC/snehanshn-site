@@ -12,6 +12,8 @@
   --noise: #8b93a7; /* secondary text - the noise floor */
   --glow: #e8ecf4; /* primary text - cool near-white */
   --signal: #f2a33c; /* the one accent - amber, market-terminal phosphor */
+  --grid: #3a4a70; /* brighter trace for the visible panel grid */
+  --down: #dd7373; /* dim red - downticks on the tape only */
 }
 
 @theme inline {
@@ -21,6 +23,8 @@
   --color-noise: var(--noise);
   --color-glow: var(--glow);
   --color-signal: var(--signal);
+  --color-grid: var(--grid);
+  --color-down: var(--down);
   --font-display: var(--font-archivo);
   --font-sans: var(--font-plex-sans);
   --font-mono: var(--font-plex-mono);
@@ -99,10 +103,53 @@ body {
   animation: terminal-in 0.18s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+/*
+ * Display signage: Archivo variable at full expansion and black weight.
+ * Expanded-black grotesque reads as trading-floor signage set huge.
+ */
+.signage {
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-weight: 900;
+  font-stretch: 125%;
+  letter-spacing: -0.01em;
+}
+
+/*
+ * The tape: a marquee track holding two copies of the instrument list;
+ * translating by -50% loops seamlessly. Ticks (value updates) are JS-driven
+ * in Tape.tsx; both stop under reduced motion.
+ */
+@keyframes tape-scroll {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.tape-track {
+  animation: tape-scroll var(--tape-duration, 60s) linear infinite;
+}
+
+/* The LIVE dot: a 2s heartbeat, solid under reduced motion. */
+@keyframes live-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.2;
+  }
+}
+
+.live-dot {
+  animation: live-blink 2s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .rise,
   .rise-move,
-  .terminal-in {
+  .terminal-in,
+  .tape-track,
+  .live-dot {
     animation: none;
   }
 }
