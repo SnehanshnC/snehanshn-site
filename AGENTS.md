@@ -86,6 +86,7 @@ Rules (do not break):
 - `(hover: hover) and (pointer: fine)` only - touch and keyboard get the native experience untouched. The gate is checked once on mount; the native cursor hides only while `body[data-cursor-awake]` is set (first pointermove).
 - Focus outlines are never hidden; the cursor is pointer-only garnish.
 - Reduced motion: the dot still follows (snap, no lerp) and morph transitions are disabled in globals.css.
+- Forced colors (Windows High Contrast): the browser repaints the dot/pill to Canvas while `cursor: none` survives, so the `@media (forced-colors: active)` block in globals.css restores the native cursor and hides `.cursor-pill`. It must stay AFTER the base `.cursor-pill` rule (same specificity - cascade order decides `display: none`).
 - Two-effect wiring: the first effect flips `active` so the pill renders; the second (dep `[active]`) attaches listeners once the element exists. Collapsing them back to one effect silently kills the whole system (the ref is null before the first render with `active`).
 - The rAF loop sleeps when settled (pos≈target, side≈sideGoal) instead of ticking forever on an idle tab; every input path (`onMove`, `applyMode`, press, release, resize) calls `wake()`. Any new code path that changes what `frame()` paints must call `wake()` too, or its change waits for the next pointer move.
 

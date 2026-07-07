@@ -142,6 +142,25 @@ button,
   }
 }
 
+/*
+ * Forced colors (Windows High Contrast): the browser repaints the dot/pill
+ * to Canvas, making them invisible, while `cursor: none` still holds - the
+ * visitor would have no pointer at all. Garnish yields: restore the native
+ * cursor and hide the custom one. Must come after the base .cursor-pill
+ * rule so display: none wins the cascade.
+ */
+@media (forced-colors: active) {
+  body[data-cursor-awake],
+  body[data-cursor-awake] a,
+  body[data-cursor-awake] button,
+  body[data-cursor-awake] [role="button"] {
+    cursor: auto;
+  }
+  .cursor-pill {
+    display: none;
+  }
+}
+
 /* Entrance reveal. CSS-driven so it resolves even where rAF is throttled. */
 @keyframes rise {
   from {
