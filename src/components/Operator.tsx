@@ -15,7 +15,9 @@ export default function Operator() {
         readout={`SESSIONS: ${experience.length}`}
       />
       <div className="grid gap-y-10 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
-        <div className="px-4 pt-6 sm:px-6 md:border-r md:border-trace/40 md:px-8 md:py-8">
+        {/* justify-between anchors the education line to the rail's floor at
+            desktop so the whitespace under the bio reads structured. */}
+        <div className="px-4 pt-6 sm:px-6 md:flex md:flex-col md:justify-between md:border-r md:border-trace/40 md:px-8 md:py-8">
           <p className="max-w-prose text-[15px] leading-relaxed text-glow md:text-base">
             {identity.bio}
           </p>

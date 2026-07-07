@@ -32,7 +32,10 @@ export default function Footer() {
         <p className="flex flex-wrap items-center gap-x-2 text-noise">
           <span>SESSION © 2026 {identity.name}</span>
           <span aria-hidden="true">·</span>
-          <TerminalHint />
+          {/* -mx-1 cancels the hint's own px-1 so when the session line wraps
+              at narrow widths, "PRESS /" sits optically flush with the line
+              above (same trick as -ml-2 on the link list). */}
+          <TerminalHint className="-mx-1" />
         </p>
       </div>
     </footer>

@@ -28,7 +28,7 @@ export default function Hero() {
       {/* Nudged up on small screens so the copy sits above the depth band
           and the sparse strip under the tape shrinks. */}
       <div className="relative z-10 flex flex-1 flex-col justify-center pb-[10svh] px-3 sm:px-5 md:px-7 md:pb-0">
-        <h1 className="rise-move signage text-[clamp(2.2rem,10.9vw,10.2rem)] leading-[0.92] tracking-tight text-glow uppercase">
+        <h1 className="rise-move signage text-[clamp(2.2rem,10.4vw,10.2rem)] leading-[0.92] tracking-tight text-glow uppercase">
           Snehanshn
           <br />
           Chowdhury
