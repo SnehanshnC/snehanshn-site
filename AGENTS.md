@@ -118,7 +118,8 @@ No animation libraries in initial-load components (framer-motion was removed for
 Lighthouse mobile on `/`: performance ≥95, accessibility ≥95 (re-check after any hero/font change - LCP is the h1 font swap).
 Zero console messages, hydration-clean, no horizontal scroll at 390px, all interactive elements ≥44px, focus outlines visible, full keyboard walk incl. terminal and nav across pages.
 Reduced motion: pages render complete and static; cursor follows without trail.
-Screenshots for review live under `docs/screenshots/` (all pages at 390/768/1440 + cursor states).
+Print / save-as-PDF: no work card may straddle a page break - the `@media print` block in globals.css (`.work-card { break-inside: avoid }`) guarantees it; the SVG covers are monolithic so Chromium happens to push them whole anyway, but text can still split without the rule.
+Screenshots for review live under `docs/screenshots/` (all pages at 390/768/1440 + cursor states; print captures as `print-home-*.png`).
 
 ## Content
 
