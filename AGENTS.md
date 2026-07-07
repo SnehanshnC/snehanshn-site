@@ -27,7 +27,10 @@ Never reintroduce background noise (canvases, tickers, particle fields).
 
 `Nav.tsx` (name + one-word role, Work / Fun / About, the `>_` terminal doorway) and `Footer.tsx` (sign-off + links + "press /") frame every page via `layout.tsx`.
 `template.tsx` gives each route change a fast transform-only rise (`.page-in`); a fade there would delay the LCP paint.
-`ScrollRestorer.tsx` (mounted in `layout.tsx`) restores scroll positions on back/forward - Next 16's async re-render defeats the browser's native restore, so it records scrollY per history entry (index stamped into `history.state`, positions in `sessionStorage`) and re-applies after popstate once the document is tall enough. Link navigations still start at top.
+`ScrollRestorer.tsx` (mounted in `layout.tsx`) restores scroll positions on back/forward and reload - Next 16's async re-render defeats the browser's native restore, so it records scrollY per history entry (index stamped into `history.state`, positions in `sessionStorage`) and re-applies after popstate once the document is tall enough.
+y=0 is restored too: with `scrollRestoration` forced to "manual", skipping it would strand the visitor at the leaving page's scroll position.
+Positions are captured at user-intent time (capture-phase click/keydown on `document`), not inside the pushState wrapper, and scroll-driven saves are muted briefly after an intent save - the viewport can move programmatically between the user's action and pushState, which would clobber the saved value with 0.
+Fresh link navigations still start at top.
 Every page's h1 is a `.statement` sentence with ONE italic emphasis word (`<em>`, amber).
 
 ## Design tokens (the day-desk palette)
