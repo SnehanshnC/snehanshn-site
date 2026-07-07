@@ -164,7 +164,7 @@ function runCommand(raw: string): {
             ? ""
             : `\nemail: ${contact.email.href.replace(/^mailto:/, "")}`;
         return {
-          output: `[sudo] password accepted.\naccess granted: I start Mondays.${email}`,
+          output: `[sudo] password for guest: accepted.\naccess granted: I start Mondays.${email}`,
         };
       }
       return { output: `sudo: ${arg}: not in the sudoers file` };

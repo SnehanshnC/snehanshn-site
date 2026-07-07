@@ -94,7 +94,7 @@ export const projects: Project[] = [
     ticker: "YUNO",
     name: "Yuno Research",
     tagline: "Solana trading infrastructure",
-    metric: { value: "5M+", label: "swaps/day" },
+    metric: { value: "5M+", label: "swaps/day · ~60% of DEX volume" },
     description:
       "On-chain prop desk streaming live gRPC data from Raydium, Orca, and Meteora to catch AMM arbitrage in milliseconds. Rust ingestion engine hitting 5GB/s disk saturation; 5M+ swaps processed daily across roughly 60% of DEX volume.",
     role: "Co-founder & lead infrastructure engineer, led an 8-person team",
@@ -110,7 +110,7 @@ export const projects: Project[] = [
     metric: { value: "+300%", label: "application throughput" },
     description:
       "Scrapes GitHub, LinkedIn, and job boards to build developer portfolios, match roles, and autofill applications. LLaMA-based skill extraction; +300% application throughput.",
-    awards: [{ badge: "1st @ HackNYU", full: "1st Place Overall @ HackNYU" }],
+    awards: [{ badge: "1st @ HackNYU '25", full: "1st Place Overall @ HackNYU 2025" }],
     link: { label: "Devpost", href: "https://devpost.com/software/algora" },
     cover: { hue: 174, motif: "routes" },
   },
@@ -118,7 +118,7 @@ export const projects: Project[] = [
     slug: "synapse",
     ticker: "SNPS",
     name: "Synapse",
-    tagline: "GraphRAG learning intelligence",
+    tagline: "videos into knowledge graphs",
     metric: { value: "1st", label: "education @ HackRU '25", fromAward: true },
     description:
       "Turns short-form video into structured knowledge graphs with OCR, transcription, and GraphRAG over Neo4j for cross-context retrieval.",
@@ -139,7 +139,7 @@ export const projects: Project[] = [
     ticker: "QRRY",
     name: "Quarry",
     tagline: "AI data marketplace",
-    metric: { value: "x402", label: "solana micropayments" },
+    metric: { value: "x402", label: "Solana micropayments" },
     description:
       "Schema-only marketplace where AI agents preview datasets through DuckDB queries and buy slices with Solana x402 micropayments. Parquet pipelines with IPFS verification.",
     awards: [],
@@ -225,18 +225,18 @@ export const wins: Win[] = [
     year: "2024",
   },
   {
+    placement: "Best",
+    detail: "Freshman Hack @ HackRU",
+    context: "FraxAI",
+    year: "2024",
+  },
+  {
     placement: "420/50k",
     detail: "xAI Hackathon Select",
     context: "of 50,000 applicants",
     year: "2025",
   },
   { placement: "W", detail: "Jersey CTF", context: "capture the flag", year: "2024" },
-  {
-    placement: "Best",
-    detail: "Freshman Hack @ HackRU",
-    context: "FraxAI",
-    year: "2024",
-  },
   {
     placement: "2nd",
     detail: "Road to Silicon Valley",
@@ -252,7 +252,7 @@ export const experience: Experience[] = [
     year: "2025",
     period: "May 2025 – present",
     summary:
-      "Architected the agent orchestration layer for an agentic bioinformatics platform. Code-as-context pattern running analyses over 1TB+ genomics data; Modal spot-GPU compute cutting inference cost ~70%.",
+      "Building the agent orchestration layer for their bioinformatics platform - agents that write and run code over 1TB+ of genomics data, on spot GPUs that cut inference cost about 70%.",
     // TODO(snehanshn): add the real NovaFlow URL when public.
   },
   {
