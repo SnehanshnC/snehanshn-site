@@ -205,6 +205,12 @@ export type TapeInstrument = {
   suffix?: string;
   /** Max walk deviation as a fraction of base. Absent/0 = static. */
   vol?: number;
+  /**
+   * Cost-like instrument where DOWN is the win (e.g. GPU COST): the down
+   * move gets the amber marker. Everything else is up-is-good and never
+   * shows a downtick - achievements don't read as bad news.
+   */
+  winDown?: boolean;
 };
 
 /**
@@ -219,7 +225,15 @@ export const tape: TapeInstrument[] = [
   { symbol: "HACKATHON W/L", text: "6-0" },
   { symbol: "APP THROUGHPUT", text: "+300%" },
   { symbol: "GENOMICS", base: 1.02, decimals: 2, suffix: "TB", vol: 0.012 },
-  { symbol: "GPU COST", text: "-70%" },
+  {
+    symbol: "GPU COST",
+    base: 70,
+    decimals: 1,
+    prefix: "-",
+    suffix: "%",
+    vol: 0.006,
+    winDown: true,
+  },
   { symbol: "DESK", text: "NOVAFLOW · YC S25" },
   { symbol: "EDU", text: "RUTGERS CS+MATH" },
 ];

@@ -1,7 +1,7 @@
-import About from "@/components/About";
 import Footer from "@/components/Footer";
 import Hero from "@/components/Hero";
-import OffTheClock from "@/components/OffTheClock";
+import OffHours from "@/components/OffHours";
+import Operator from "@/components/Operator";
 import Positions from "@/components/Positions";
 import Tape from "@/components/Tape";
 import Terminal from "@/components/Terminal";
@@ -15,8 +15,8 @@ export default function Home() {
         <main className="flex-1">
           <Hero />
           <Positions />
-          <About />
-          <OffTheClock />
+          <Operator />
+          <OffHours />
         </main>
         <Footer />
       </div>

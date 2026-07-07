@@ -41,6 +41,10 @@ function InstrumentList({ quotes, hidden }: { quotes: Quote[]; hidden?: boolean 
       {tape.map((inst, i) => {
         const q = quotes[i];
         const ticks = inst.base !== undefined && (inst.vol ?? 0) > 0;
+        // Up-is-good instruments mark up moves only; winDown (cost-like)
+        // marks down moves. Either way the marker is amber - a win - and
+        // nothing on the tape ever reads as bad news.
+        const win = ticks && (inst.winDown ? q.dir === -1 : q.dir === 1);
         return (
           <span
             key={inst.symbol}
@@ -53,9 +57,9 @@ function InstrumentList({ quotes, hidden }: { quotes: Quote[]; hidden?: boolean 
             {ticks && (
               <span
                 aria-hidden="true"
-                className={q.dir === -1 ? "text-down" : "text-signal"}
+                className="inline-block w-[1em] text-signal"
               >
-                {q.dir === -1 ? "▼" : "▲"}
+                {win ? (inst.winDown ? "▼" : "▲") : ""}
               </span>
             )}
           </span>

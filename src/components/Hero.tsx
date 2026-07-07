@@ -1,6 +1,7 @@
 import { identity } from "@/content";
 import OrderFlow from "./OrderFlow";
 import SessionClock from "./SessionClock";
+import TerminalHint from "./TerminalHint";
 
 /*
  * The hero: the name set enormous - trading-floor signage - over the
@@ -24,7 +25,9 @@ export default function Hero() {
       </div>
 
       {/* The instrument itself. */}
-      <div className="relative z-10 flex flex-1 flex-col justify-center px-3 sm:px-5 md:px-7">
+      {/* Nudged up on small screens so the copy sits above the depth band
+          and the sparse strip under the tape shrinks. */}
+      <div className="relative z-10 flex flex-1 flex-col justify-center pb-[10svh] px-3 sm:px-5 md:px-7 md:pb-0">
         <h1 className="rise-move signage text-[clamp(2.2rem,10.9vw,10.2rem)] leading-[0.92] tracking-tight text-glow uppercase">
           Snehanshn
           <br />
@@ -46,9 +49,9 @@ export default function Hero() {
           </span>
           the book
         </a>
-        <p className="rise hidden text-noise sm:block [animation-delay:600ms]">
-          press / for the terminal
-        </p>
+        <span className="rise hidden sm:block [animation-delay:600ms]">
+          <TerminalHint label="press / for the terminal" />
+        </span>
       </div>
     </section>
   );
