@@ -237,6 +237,19 @@ export default function Terminal() {
     if (open) inputRef.current?.focus();
   }, [open]);
 
+  // The paper must not slide under the open terminal: wheel/touch over the
+  // overlay would scroll the body, so Escape would drop you somewhere you
+  // never navigated to. Lock body scroll while open; the output pane keeps
+  // its own scrolling (overscroll-contain stops chaining at its edges).
+  useEffect(() => {
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [open]);
+
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight });
   }, [lines]);
@@ -352,7 +365,7 @@ export default function Terminal() {
 
         <div
           ref={scrollRef}
-          className="flex-1 overflow-y-auto px-4 py-3 font-mono text-[13px] leading-relaxed"
+          className="flex-1 overflow-y-auto overscroll-contain px-4 py-3 font-mono text-[13px] leading-relaxed"
         >
           {lines.map((line, i) =>
             line.kind === "input" ? (

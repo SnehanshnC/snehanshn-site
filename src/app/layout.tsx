@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { Fraunces, IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import { site } from "@/content";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import Cursor from "@/components/Cursor";
+import ScrollRestorer from "@/components/ScrollRestorer";
 import Terminal from "@/components/Terminal";
 import "./globals.css";
 
@@ -18,12 +20,18 @@ const fraunces = Fraunces({
   axes: ["opsz"],
 });
 
-const frauncesItalic = Fraunces({
+// The italic paints one emphasis word per page, yet as part of the h1 its
+// swap is a fresh LCP candidate - the full Google italic (80KB) was the
+// last thing gating LCP. This is a text-subset build (~10KB) holding only
+// the emphasis words' glyphs. To change an emphasis word, re-fetch with
+// the new glyphs in `text=` (see the LCP contract in AGENTS.md):
+//   curl -A "Mozilla/5.0 ... Chrome/120.0" "https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,100..900&text=<all emphasis words>&display=swap"
+// then download the woff2 it points at over this file.
+const frauncesItalic = localFont({
+  src: "./fraunces-italic-subset.woff2",
   variable: "--font-fraunces-italic",
-  subsets: ["latin"],
-  axes: ["opsz"],
-  style: ["italic"],
-  preload: false,
+  style: "italic",
+  weight: "100 900",
 });
 
 const plexSans = IBM_Plex_Sans({
@@ -59,6 +67,7 @@ export default function RootLayout({
         <Footer />
         <Terminal />
         <Cursor />
+        <ScrollRestorer />
       </body>
     </html>
   );
