@@ -40,7 +40,7 @@ export default function Nav() {
                 key={href}
                 href={href}
                 aria-current={active ? "page" : undefined}
-                className={`flex min-h-11 items-center px-2.5 font-mono text-[13px] tracking-[0.08em] uppercase transition-colors duration-150 sm:px-3 ${
+                className={`flex min-h-11 items-center px-2.5 font-mono text-[13px] tracking-[0.08em] uppercase transition-colors duration-150 max-[359px]:px-1.5 sm:px-3 ${
                   active ? "text-signal" : "text-faint hover:text-ink"
                 }`}
               >
@@ -53,7 +53,7 @@ export default function Nav() {
             aria-label="Open terminal"
             data-cursor="press /"
             onClick={() => window.dispatchEvent(new Event("terminal:open"))}
-            className="ml-1 flex min-h-11 min-w-11 items-center justify-center border border-line px-3 font-mono text-[13px] text-faint transition-colors duration-150 hover:border-ink hover:text-ink"
+            className="ml-1 flex min-h-11 min-w-11 items-center justify-center border border-line px-3 font-mono text-[13px] text-faint transition-colors duration-150 max-[359px]:ml-0 max-[359px]:px-2 hover:border-ink hover:text-ink"
           >
             {">_"}
           </button>

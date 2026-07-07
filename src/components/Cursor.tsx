@@ -39,6 +39,9 @@ export default function Cursor() {
   // the second wires events once the pill element exists.
   useEffect(() => {
     if (window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+      // The gate can only be read client-side (SSR has no matchMedia), so
+      // this one deliberate post-mount setState is how the pill appears.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setActive(true);
     }
   }, []);
