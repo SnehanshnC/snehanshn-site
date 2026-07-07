@@ -1,14 +1,16 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { contact, identity, otherWins, projects } from "@/content";
 
 /*
- * The easter egg: press `/` anywhere (or tap "press /" in the footer) to
- * open a terminal over the page. It speaks the site's own tokens (amber
- * prompt on surface), not the green-on-black cliché. Fully keyboard-
- * operable: type, Tab to complete, Enter, ArrowUp/Down for history
- * (persisted for the session), Escape or `exit` to close.
+ * The surprise beat: press `/` anywhere (or the `>_` button in the nav,
+ * or "press /" in the footer) and a night-desk terminal opens over the
+ * paper - the one dramatic dark moment on the site, the market-desk
+ * heritage in a box. Fully keyboard-operable: type, Tab to complete,
+ * Enter, ArrowUp/Down for history (persisted for the session), Escape
+ * or `exit` to close.
  */
 
 type Line = { kind: "input" | "output"; text: string };
@@ -17,10 +19,10 @@ const HELP = `commands:
   help              this list
   ls projects       what I've built
   open <project>    open a project's link
+  goto <page>       go to work / fun / about
   cat awards        the trophy cabinet, quietly
   whoami            who is this guy
   sudo hire-me      escalate privileges
-  pulse             catch an arb on the hero
   clear             clear the screen
   exit              close the terminal`;
 
@@ -28,18 +30,25 @@ const COMMANDS = [
   "cat",
   "clear",
   "exit",
+  "goto",
   "help",
   "ls",
   "open",
-  "pulse",
   "sudo",
   "whoami",
 ];
+
+const PAGES: Record<string, string> = {
+  work: "/",
+  fun: "/fun",
+  about: "/about",
+};
 
 /** Argument completions per command, for Tab. */
 const COMMAND_ARGS: Record<string, string[]> = {
   ls: ["projects"],
   open: projects.map((p) => p.slug),
+  goto: Object.keys(PAGES),
   cat: ["awards"],
   sudo: ["hire-me"],
 };
@@ -93,9 +102,9 @@ function complete(
 function runCommand(raw: string): {
   output: string;
   url?: string;
+  route?: string;
   exit?: boolean;
   clear?: boolean;
-  pulse?: boolean;
 } {
   const input = raw.trim();
   const [cmd, ...rest] = input.split(/\s+/);
@@ -127,6 +136,15 @@ function runCommand(raw: string): {
         url: project.link.href,
       };
     }
+    case "goto": {
+      const route = PAGES[arg];
+      if (!route) {
+        return {
+          output: `goto: ${arg || "<page>"}: not found (try: goto work | fun | about)`,
+        };
+      }
+      return { output: "", route, exit: true };
+    }
     case "cat":
       if (arg === "awards") {
         const cardAwards = projects
@@ -152,8 +170,6 @@ function runCommand(raw: string): {
       return { output: `sudo: ${arg}: not in the sudoers file` };
     case "clear":
       return { output: "", clear: true };
-    case "pulse":
-      return { output: "", exit: true, pulse: true };
     case "exit":
       return { output: "", exit: true };
     default:
@@ -162,6 +178,7 @@ function runCommand(raw: string): {
 }
 
 export default function Terminal() {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [lines, setLines] = useState<Line[]>([]);
   const [value, setValue] = useState("");
@@ -171,11 +188,9 @@ export default function Terminal() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const restoreFocusRef = useRef<HTMLElement | null>(null);
 
-  const close = useCallback(() => {
+  const close = useCallback((restoreFocus = true) => {
     setOpen(false);
-    // preventScroll keeps `pulse` (which scrolls to the hero) from being
-    // yanked back to the restored element; a plain close never scrolled.
-    restoreFocusRef.current?.focus({ preventScroll: true });
+    if (restoreFocus) restoreFocusRef.current?.focus({ preventScroll: true });
   }, []);
 
   const openTerminal = useCallback(() => {
@@ -240,18 +255,11 @@ export default function Terminal() {
     }
     setHistoryIndex(-1);
     setValue("");
-    if (result.pulse) {
-      close();
-      const reduced = window.matchMedia(
-        "(prefers-reduced-motion: reduce)"
-      ).matches;
-      window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" });
-      // Let the hero scroll into view before the arb fires (MarketFlow
-      // ignores the event entirely under reduced motion).
-      window.setTimeout(
-        () => window.dispatchEvent(new Event("marketflow:pulse")),
-        reduced ? 0 : 450
-      );
+    if (result.route) {
+      // Don't restore focus to the pre-open element: it belongs to the
+      // page being left. Focus lands at the top of the new page.
+      close(false);
+      router.push(result.route);
       return;
     }
     if (result.exit) {
@@ -315,7 +323,7 @@ export default function Terminal() {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center bg-void/70 px-4 pt-[12svh] backdrop-blur-sm sm:px-6"
+      className="fixed inset-0 z-50 flex items-start justify-center bg-void/60 px-4 pt-[12svh] backdrop-blur-sm sm:px-6"
       onMouseDown={(e) => {
         if (e.target === e.currentTarget) close();
       }}
@@ -324,67 +332,67 @@ export default function Terminal() {
         role="dialog"
         aria-modal="true"
         aria-label="Terminal"
-        className="terminal-in flex max-h-[70svh] w-full max-w-2xl flex-col overflow-hidden border border-grid/70 bg-surface shadow-2xl shadow-void"
+        className="terminal-in flex max-h-[70svh] w-full max-w-2xl flex-col overflow-hidden border border-grid/70 bg-surface shadow-2xl shadow-void/60"
       >
-            <div className="flex items-center justify-between border-b border-grid/70 bg-void/40 px-4 py-1">
-              <p className="font-mono text-[11px] tracking-[0.14em] text-noise uppercase">
-                <span aria-hidden="true" className="text-signal">
-                  ▸
-                </span>{" "}
-                snehanshn@desk:~
+        <div className="flex items-center justify-between border-b border-grid/70 bg-void/40 px-4 py-1">
+          <p className="font-mono text-[11px] tracking-[0.14em] text-noise uppercase">
+            <span aria-hidden="true" className="text-flare">
+              ▸
+            </span>{" "}
+            snehanshn@desk:~
+          </p>
+          <button
+            type="button"
+            onClick={() => close()}
+            className="min-h-11 min-w-11 px-3 font-mono text-[11px] tracking-[0.14em] text-noise uppercase transition-colors duration-150 hover:text-flare"
+          >
+            esc
+          </button>
+        </div>
+
+        <div
+          ref={scrollRef}
+          className="flex-1 overflow-y-auto px-4 py-3 font-mono text-[13px] leading-relaxed"
+        >
+          {lines.map((line, i) =>
+            line.kind === "input" ? (
+              <p key={i} className="text-glow">
+                <span aria-hidden="true" className="text-flare">
+                  ❯{" "}
+                </span>
+                {line.text}
               </p>
-              <button
-                type="button"
-                onClick={close}
-                className="min-h-11 min-w-11 cursor-pointer px-3 font-mono text-[11px] tracking-[0.14em] text-noise uppercase transition-colors duration-150 hover:text-signal"
+            ) : (
+              <pre
+                key={i}
+                className="whitespace-pre-wrap break-words text-noise"
               >
-                esc
-              </button>
-            </div>
+                {line.text}
+              </pre>
+            )
+          )}
+        </div>
 
-            <div
-              ref={scrollRef}
-              className="flex-1 overflow-y-auto px-4 py-3 font-mono text-[13px] leading-relaxed"
-            >
-              {lines.map((line, i) =>
-                line.kind === "input" ? (
-                  <p key={i} className="text-glow">
-                    <span aria-hidden="true" className="text-signal">
-                      ❯{" "}
-                    </span>
-                    {line.text}
-                  </p>
-                ) : (
-                  <pre
-                    key={i}
-                    className="whitespace-pre-wrap break-words text-noise"
-                  >
-                    {line.text}
-                  </pre>
-                )
-              )}
-            </div>
-
-            <div className="flex items-center gap-2 border-t border-trace/60 px-4 py-3">
-              <span aria-hidden="true" className="font-mono text-[13px] text-signal">
-                ❯
-              </span>
-              <input
-                ref={inputRef}
-                data-terminal-input
-                value={value}
-                onChange={(e) => setValue(e.target.value)}
-                onKeyDown={onInputKey}
-                aria-label="Terminal command"
-                autoCapitalize="off"
-                autoComplete="off"
-                autoCorrect="off"
-                spellCheck={false}
-                className="min-h-6 w-full bg-transparent font-mono text-[13px] text-glow caret-signal outline-none placeholder:text-noise/50"
-                placeholder="help"
-              />
-            </div>
-          </div>
+        <div className="flex items-center gap-2 border-t border-trace/60 px-4 py-3">
+          <span aria-hidden="true" className="font-mono text-[13px] text-flare">
+            ❯
+          </span>
+          <input
+            ref={inputRef}
+            data-terminal-input
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            onKeyDown={onInputKey}
+            aria-label="Terminal command"
+            autoCapitalize="off"
+            autoComplete="off"
+            autoCorrect="off"
+            spellCheck={false}
+            className="min-h-6 w-full bg-transparent font-mono text-[13px] text-glow caret-flare outline-none placeholder:text-noise/50"
+            placeholder="help"
+          />
+        </div>
+      </div>
     </div>
   );
 }

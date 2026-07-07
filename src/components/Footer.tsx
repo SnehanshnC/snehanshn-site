@@ -1,4 +1,4 @@
-import { contact, identity } from "@/content";
+import { contact, signOff } from "@/content";
 import TerminalHint from "./TerminalHint";
 
 /* Links still awaiting a real URL (`#todo` in content.ts) are not rendered. */
@@ -6,37 +6,28 @@ const links = [contact.github, contact.linkedin, contact.x, contact.email].filte
   (link) => link.href !== "#todo"
 );
 
-/*
- * The footer as the surface's status bar: links left, session line right,
- * in the same data voice as the tape and module headers.
- */
 export default function Footer() {
   return (
-    <footer className="border-t border-grid/70 bg-surface/40">
-      <div className="flex flex-col gap-x-6 gap-y-2 px-4 py-3 font-mono text-[11px] tracking-[0.14em] uppercase sm:px-6 md:flex-row md:items-center md:justify-between md:px-8">
-        <ul className="-ml-2 flex flex-wrap gap-x-1">
-          {links.map((link) => (
-            <li key={link.label}>
-              <a
-                href={link.href}
-                {...(link.href.startsWith("http")
-                  ? { target: "_blank", rel: "noopener noreferrer" }
-                  : {})}
-                className="inline-block min-h-11 content-center px-2 text-noise transition-colors duration-150 hover:text-signal"
-              >
-                {link.label} ↗
-              </a>
-            </li>
-          ))}
-        </ul>
-        <p className="flex flex-wrap items-center gap-x-2 text-noise">
-          <span>SESSION © 2026 {identity.name}</span>
-          <span aria-hidden="true">·</span>
-          {/* -mx-1 cancels the hint's own px-1 so when the session line wraps
-              at narrow widths, "PRESS /" sits optically flush with the line
-              above (same trick as -ml-2 on the link list). */}
-          <TerminalHint className="-mx-1" />
+    <footer className="border-t border-line">
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-2 px-5 py-6 sm:px-8">
+        <p className="font-mono text-[12px] tracking-[0.06em] text-faint">
+          {signOff}
         </p>
+        <div className="flex items-center gap-5">
+          {links.map((l) => (
+            <a
+              key={l.label}
+              href={l.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-cursor={`${l.label.toLowerCase()} ↗`}
+              className="flex min-h-11 items-center font-mono text-[12px] tracking-[0.1em] text-faint uppercase transition-colors duration-150 hover:text-ink"
+            >
+              {l.label}
+            </a>
+          ))}
+          <TerminalHint />
+        </div>
       </div>
     </footer>
   );

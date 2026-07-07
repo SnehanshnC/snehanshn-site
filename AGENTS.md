@@ -7,95 +7,111 @@ This version has breaking changes — APIs, conventions, and file structure may 
 # snehanshn.com - agent notes
 
 Personal portfolio for Snehanshn Chowdhury.
-Next.js App Router + TypeScript + Tailwind v4. Dark theme only, no toggle.
+Next.js App Router + TypeScript + Tailwind v4. Light theme only, no toggle.
 
 ## The organizing idea
 
-THE PAGE IS A LIVE TRADING SURFACE, AND SNEHANSHN IS THE INSTRUMENT.
-Every module behaves like a serious trading terminal: dense, precise, alive with data, zero decoration.
-Structure (top to bottom, all inside a visible hairline frame in `page.tsx`):
+QUIET PAGE, LIVE FINGERTIPS.
+The page is calm - warm paper, editorial serif statements, generous air, zero background motion.
+All the personality lives where the visitor's hands are: a custom cursor that talks, cards that answer hover, and a dark terminal behind `/`.
+The site's market-desk history survives only as whispers: mono labels, tabular numbers, one amber thread, a tiny sparkline on /fun, and the terminal as the single dramatic dark moment.
+Never reintroduce background noise (canvases, tickers, particle fields).
 
-| Module | File | What it is |
+## Page map
+
+| Route | File | What it is |
 | --- | --- | --- |
-| Tape | `Tape.tsx` | Sticky ticker streaming real metrics as instruments; seeded walk + CSS marquee |
-| Hero | `Hero.tsx` + `OrderFlow.tsx` + `SessionClock.tsx` | Name as signage over the order-flow canvas; kicker + LIVE/UTC data rows |
-| 01 / POSITIONS | `Positions.tsx` | The six projects as a book: ticker, prose, display-size metric in a fixed right rail |
-| 02 / OPERATOR | `Operator.tsx` | Bio + education left rail, experience as session rows, FILLS line |
-| 03 / OFF-HOURS | `OffHours.tsx` | Currently line (+ photo grid when content.ts has photos) |
-| Footer | `Footer.tsx` | Status bar: links, session line, press / |
+| `/` | `app/page.tsx` | Statement hero + experience ledger (`Ledger.tsx`), work grid of six cards (`WorkCard.tsx` + `Cover.tsx`) |
+| `/fun` | `app/fun/page.tsx` | The wall (all wins as tiles), photo-dump placeholders, currently strip with `Sparkline.tsx` |
+| `/about` | `app/about/page.tsx` | Bio, education, now-building, TODO-gated contact block |
 
-`ModuleHeader.tsx` renders every section's `NN / TITLE` bar with a right-side readout.
-The rule of motion: everything that moves represents data (ticks, flows, pulses, a drawing line, a clock). Nothing fades/bounces/slides for decoration.
+`Nav.tsx` (name + one-word role, Work / Fun / About, the `>_` terminal doorway) and `Footer.tsx` (sign-off + links + "press /") frame every page via `layout.tsx`.
+`template.tsx` gives each route change a fast transform-only rise (`.page-in`); a fade there would delay the LCP paint.
+Every page's h1 is a `.statement` sentence with ONE italic emphasis word (`<em>`, amber).
 
-## Design tokens (the night-desk palette)
+## Design tokens (the day-desk palette)
 
-Defined once in `src/app/globals.css`, exposed to Tailwind via `@theme inline` (`text-noise`, `bg-surface`, etc).
-Eight tokens, no more:
+Defined once in `src/app/globals.css`, exposed to Tailwind via `@theme inline` (`text-faint`, `bg-paper`, etc).
+Seven light tokens + the night-desk set scoped to the terminal; no more:
 
 | Token | Hex | Use |
 | --- | --- | --- |
-| `--void` | `#0a0e16` | page background, blue-tinted night |
-| `--surface` | `#101622` | raised panels, module header bars, terminal |
-| `--trace` | `#2a3550` | inner hairlines, row dividers |
-| `--noise` | `#8b93a7` | secondary text, canvas particles |
-| `--glow` | `#e8ecf4` | primary text |
-| `--signal` | `#f2a33c` | the single accent (amber): pulses, tape win-markers, award tags, focus rings |
-| `--grid` | `#3a4a70` | the visible panel grid - page frame, module header rules, chart furniture |
-| `--down` | `#dd7373` | reserved for down-is-bad readouts; currently unused (see tape semantics) |
+| `--paper` | `#faf8f3` | page background - warm ivory, never pure white |
+| `--ink` | `#211d16` | primary text - warm near-black |
+| `--faint` | `#6d6558` | secondary text (5.2:1 on paper - AA) |
+| `--line` | `#e5dfd2` | hairlines, dividers, card borders |
+| `--wash` | `#f1ede4` | raised tint panels, photo placeholders |
+| `--signal` | `#9c5a00` | text-safe amber: links, active nav, focus rings (5.1:1 on paper) |
+| `--flare` | `#f2a33c` | bright amber fills: cursor pill, award tags, selection - always ink text on top (7.8:1) |
 
-Type: the display voice is Archivo (variable, `wdth` axis) set via the `.signage` class in globals.css - 125% width / 900 weight, trading-floor signage.
-`font-sans` = IBM Plex Sans (prose), `font-mono` = IBM Plex Mono (labels, numbers, headers, tape, terminal).
-Use `tabular-nums` wherever a value ticks or numbers align vertically.
+Terminal-only night-desk tokens: `--void`, `--surface`, `--trace`, `--noise`, `--glow`, `--grid`.
+Inside the terminal the accent is `--flare` (bright amber on dark); `--signal` is too dark there.
+Contrast rule: `--signal` is the darkest amber that passes AA on paper - never lighten it for text; `--flare` is fill-only.
 
-## The tape (`src/components/Tape.tsx`)
+## Type
 
-Instruments come from `tape` in `content.ts` (symbol + static `text`, or `base/decimals/prefix/suffix/vol` for ticking values).
-Values walk around the true figures via mulberry32 (seed `0x5eed1`), tick every `TICK_MS` 2100ms.
-No `Math.random` in render paths: server render and first client render both show base values; ticking starts in an effect.
-Semantics: up-is-good instruments mark up moves with amber ▲ and show nothing on down moves; `winDown: true` (cost-like, e.g. GPU COST) marks down moves with amber ▼. Nothing on the tape ever reads as bad news - achievements never downtick red.
-The marquee is CSS (`.tape-track`, `--tape-duration` 60s); marquee and ticks both stop under reduced motion.
+- `.statement` = Fraunces (variable, `opsz` axis only), weight 480 - the editorial display voice; its true italic carries the emphasis word.
+- `font-sans` = IBM Plex Sans 400/500 (prose).
+- `font-mono` = IBM Plex Mono 400/500 (labels, ledger years, card metadata, terminal, footer).
+- Use `tabular-nums` wherever numbers align vertically.
 
-## The signature (`src/components/OrderFlow.tsx`)
+LCP contract (do not regress - the h1 is the LCP element on every page):
+Fraunces loads without the SOFT/WONK axes (they double the bytes) and the italic is a SEPARATE `preload: false` family (`--font-fraunces-italic`, applied by `.statement em`), so italic bytes never gate the h1's big font-swap repaint.
+Adding weights/axes/subsets to any preloaded font must be justified against Lighthouse mobile LCP.
 
-Raw canvas 2D order-flow surface under the hero. Three systems, all data-shaped:
+## The cursor (`src/components/Cursor.tsx`) - the signature
 
-- Flow lanes: sine streamlines carrying particle currents across the full width; every `COUNTERFLOW_EVERY` 3rd lane runs right-to-left, dimmer.
-- Arbitrage pulses: an amber streak races a lane end-to-end every `PULSE_EVERY_MS` 2.8-5.2s; a click on open canvas fires one on the nearest lane (guarded by `closest("h1, p, a, button")`); the terminal's `pulse` command dispatches `marketflow:pulse`.
-- Depth chart: a seeded step line (`DEPTH_STEPS` 96) drawing in over `DEPTH_DRAW_MS` 8s, holding 6s, then rebuilding.
+A 10px amber dot follows the pointer (rAF + lerp, `LERP` 0.32); over a target carrying `data-cursor="label"` it morphs into a mono pill speaking that label, riding `PILL_GAP` 16px right of the pointer so it never covers what it points at.
+Label conventions: work cards say the link kind ("devpost ↗", "live ↗", "github ↗", "dorahacks ↗" - derived in `WorkCard.tsx`), contact links "<name> ↗", the terminal doorways "press /", the nav name the latency joke (`identity.latencyJoke`, "~2ms").
+Plain links/buttons without `data-cursor` just grow the dot (`GROW` 18px); text fields put it to sleep (native I-beam returns via CSS).
 
-Key constants: `DESKTOP_LANES` 10 / `MOBILE_LANES` 7, `DESKTOP_PARTICLES` 460 / `MOBILE_PARTICLES` 150 (breakpoint 768px), `LANE_BAND` [0.06, 0.66] desktop and `LANE_BAND_MOBILE` [0.05, 0.42] (pulses must stay clear of the hero copy at mobile widths), `DEPTH_BAND` [0.73, 0.92] (clear of the hero copy above and the status row below), `POINTER_RADIUS` 130 / `POINTER_BOOST` 2.2 (hover-capable devices only), `DPR_CAP` 2, PRNG seed `0x1a2b3c` (deterministic static frames).
-
-Performance contract (do not regress - Lighthouse TBT budget): rendering is layered. Lanes + chart furniture paint once per resize into a static offscreen layer; the depth chart paints into its own layer only when its reveal advances; the rAF frame just blits both layers, draws particles batched into `ALPHA_BUCKETS`×2 fill calls, and strokes the active pulse. Never return to per-frame path drawing - it read as one long task under Lighthouse's simulated throttling and cost 26 performance points.
-
-Behavior contracts (do not regress): a synchronous frame is painted on resize so the canvas is never blank in headless captures; the rAF loop is cancelled (not idled) when the tab is hidden or the canvas leaves the viewport, restarted by IntersectionObserver/visibilitychange; `prefers-reduced-motion` gets a composed static frame - full field, full depth line, one pulse frozen on an upper lane (above the name) - a terminal paused, not off.
-
-All page animation is CSS (`.rise`, `.rise-move`, `.terminal-in`, `.tape-track`, `.live-dot` in `globals.css`) or raw canvas - rAF-driven JS entrance animations freeze in headless capture environments, and animation libraries in initial-load components regress TBT (framer-motion was dropped from the bundle for ~97KiB; if ever reintroduced, gate it behind interaction). The hero h1 uses `.rise-move` (transform-only, no fade): it is the LCP element and must paint immediately. `SessionClock` server-renders `--:--:--` and fills in an effect (frozen once under reduced motion; ticking 1s otherwise - a clock is data).
+Rules (do not break):
+- `(hover: hover) and (pointer: fine)` only - touch and keyboard get the native experience untouched. The gate is checked once on mount; the native cursor hides only while `body[data-cursor-awake]` is set (first pointermove).
+- Focus outlines are never hidden; the cursor is pointer-only garnish.
+- Reduced motion: the dot still follows (snap, no lerp) and morph transitions are disabled in globals.css.
+- Two-effect wiring: the first effect flips `active` so the pill renders; the second (dep `[active]`) attaches listeners once the element exists. Collapsing them back to one effect silently kills the whole system (the ref is null before the first render with `active`).
 
 ## The terminal (`src/components/Terminal.tsx`)
 
-Press `/` anywhere; the "press /" hints in the footer and hero bottom row are real buttons (`TerminalHint.tsx`, optional `label` prop) dispatching `terminal:open`, so touch devices can reach it.
-Commands: help, ls projects (shows tickers), open <slug>, cat awards, whoami, sudo hire-me, pulse, clear, exit.
-Amber-on-surface, square corners, `--grid` borders, uppercase mono header (`▸ SNEHANSHN@DESK:~`) - it speaks the surface's voice, not the green-on-black cliché.
-Fully keyboard operable: Tab completes commands and arguments (ambiguous → candidates printed), Enter runs, ArrowUp/Down recall history (persisted in `sessionStorage`), Escape or `exit` closes and focus returns to the pre-open element. `pulse` closes the terminal, scrolls to the hero, and fires a canvas pulse. The input suppresses the global focus outline (`[data-terminal-input]` rule in globals.css); the amber prompt + caret carry focus. Command data all comes from `content.ts`.
+Press `/` anywhere; doorways: the `>_` button in the nav and "press /" in the footer (`TerminalHint.tsx`), both dispatching `terminal:open`.
+Commands: help, ls projects, open <slug>, goto <work|fun|about> (client-side `router.push`), cat awards, whoami, sudo hire-me, clear, exit.
+Night-desk styling (surface/void/grid tokens, `--flare` prompt) - on the light site it is the one dramatic contrast moment. Keep it dark.
+Fully keyboard operable: Tab completes commands and arguments (ambiguous → candidates printed), Enter runs, ArrowUp/Down recall history (persisted in `sessionStorage`), Escape or `exit` closes and focus returns to the pre-open element (`goto` skips the focus restore - the element belongs to the page being left).
+The input suppresses the global focus outline (`[data-terminal-input]` rule in globals.css); the amber prompt + caret carry focus. Command data all comes from `content.ts`.
 
-## Verification
+## Covers (`src/components/Cover.tsx`)
 
-Verified on this redesign (keep these floors when changing the hero, tape, or adding JS):
-Lighthouse mobile performance 95 (TBT 0ms, LCP 2.9s - the hero h1 font swap; re-check after any hero change), accessibility 100.
-Keyboard: first Tab lands on "the book", all interactive elements ≥44px, focus outlines visible.
-No horizontal scroll at 390px. Hydration-clean console. Reduced-motion static frame composed (see docs/screenshots/hero-1440-reduced-motion.png).
-Watch color-contrast: `noise` at reduced opacity on `void` fails AA (noise/60 is 2.96:1) - differentiate with size/weight/shape instead. `--down` at tape size passes AA on void if ever used.
+The work grid never shows fake screenshots: each card gets a deterministic SVG composition - a warm gradient wash in the project's hue plus a thin-line motif that says what the thing does (depth chart, routed arrows, graph, parquet blocks, waveform, EKG) with a single `--flare` accent.
+Hue + motif live on the project in `content.ts` (`cover`); new projects pick an unused motif or add one to the `CoverMotif` union in Cover.tsx.
+No randomness anywhere - server render and client render must paint identical covers.
+`// TODO(snehanshn): real screenshot` markers sit where a real image swaps in.
+
+## Motion rules
+
+All animation is CSS (`.rise`, `.rise-move`, `.page-in`, `.terminal-in`, cover hover scale, cursor-pill morph) or the cursor's rAF loop.
+Nothing in the background ever moves; motion only ever answers the visitor (hover, click, keystroke, route change).
+Every animation is disabled or reduced under `prefers-reduced-motion`.
+No animation libraries in initial-load components (framer-motion was removed for ~97KiB; if ever reintroduced, gate it behind interaction).
+
+## Verification floors (keep these when changing anything)
+
+Lighthouse mobile on `/`: performance ≥95, accessibility ≥95 (re-check after any hero/font change - LCP is the h1 font swap).
+Zero console messages, hydration-clean, no horizontal scroll at 390px, all interactive elements ≥44px, focus outlines visible, full keyboard walk incl. terminal and nav across pages.
+Reduced motion: pages render complete and static; cursor follows without trail.
+Screenshots for review live under `docs/screenshots/` (all pages at 390/768/1440 + cursor states).
 
 ## Content
 
 Every word of copy and every data item lives in `src/content.ts`, typed.
-Projects carry `ticker` (4-char instrument code), `metric` (the display-size number; `fromAward: true` means the metric IS the placement, so the award tag is not rendered again on that row), optional `stats` (secondary readout strip), and `awards`.
+Statements (hero sentences) are `pre/emphasis/post` objects; the emphasis word is the only italic on the page.
+Projects carry `ticker`, `metric` (`fromAward: true` means the metric IS the placement, so the award tag is not rendered again on that card), `awards`, `link`, and `cover` (hue + motif).
+`wins` is the /fun wall (card awards + the "other wins"); `otherWins` remains the terminal's one-liner.
 Anything mocked carries a `// TODO(snehanshn)` marker - swapping mock for real is a single-file edit.
-Privacy: phone number and street address must never appear in the repo or the site.
-Awards render as filled amber tags on position rows (or as the row's metric), never as a separate trophy section.
+Contact links whose href is `#todo` are not rendered anywhere.
+Privacy: phone number and street address must never appear in the repo or the site. No invented URLs; GitHub = https://github.com/SnehanshnC.
 
 ## Dev
 
 - `npm run dev` / `npm run build && npm run start`
-- Screenshots for review live under `docs/screenshots/`.
 - No Chrome stable on this machine: browser verification uses the Playwright Chromium under `~/Library/Caches/ms-playwright/` launched with `--remote-debugging-port`, then `CHROME_DEVTOOLS_AXI_BROWSER_URL=http://127.0.0.1:9222 chrome-devtools-axi ...` (restart the axi bridge after setting the env). `--force-prefers-reduced-motion` for reduced-motion captures. Lighthouse performance via `npx lighthouse` with `CHROME_PATH` set to that Chromium (the axi lighthouse omits the performance category).
+- chrome-devtools-axi `hover` does not synthesize pointer events; to exercise the cursor system headlessly, dispatch `PointerEvent`s via `eval`.
