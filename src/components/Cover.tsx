@@ -131,28 +131,44 @@ function Motif({ motif, hue }: { motif: CoverMotif; hue: number }) {
       );
     }
     case "blocks": {
-      // Parquet column blocks - a quarry of data slices, one amber.
+      // Parquet column blocks - a quarry of data slices, one amber slice.
       const cols = [220, 150, 260, 180, 240, 120, 200];
+      const widths = [46, 30, 46, 30, 46, 30, 46];
+      const xs = widths.reduce(
+        (acc, w) => (acc.push(acc[acc.length - 1] + w + 22), acc),
+        [97]
+      );
       return (
         <g>
           {cols.map((h, i) => {
-            const x = 70 + i * 68;
+            const x = xs[i];
+            const w = widths[i];
             const segs = Math.floor(h / 52);
             return (
               <g key={i}>
                 <rect
                   x={x}
                   y={340 - h}
-                  width={46}
+                  width={w}
                   height={h}
-                  fill={i === 4 ? FLARE : c.soft}
-                  opacity={i === 4 ? 0.9 : 0.28}
+                  fill={c.soft}
+                  opacity={0.28}
                   stroke="none"
                 />
+                {i === 4 && (
+                  <rect
+                    x={x}
+                    y={340 - h}
+                    width={w}
+                    height={52}
+                    fill={FLARE}
+                    opacity={0.9}
+                  />
+                )}
                 <rect
                   x={x}
                   y={340 - h}
-                  width={46}
+                  width={w}
                   height={h}
                   {...thin}
                 />
@@ -161,7 +177,7 @@ function Motif({ motif, hue }: { motif: CoverMotif; hue: number }) {
                     key={s}
                     x1={x}
                     y1={340 - h + (s + 1) * 52}
-                    x2={x + 46}
+                    x2={x + w}
                     y2={340 - h + (s + 1) * 52}
                     stroke={c.line}
                     strokeWidth={1.5}

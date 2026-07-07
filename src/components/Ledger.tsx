@@ -23,7 +23,7 @@ export default function Ledger() {
                 target="_blank"
                 rel="noopener noreferrer"
                 data-cursor="visit ↗"
-                className="underline decoration-line underline-offset-4 transition-colors duration-150 hover:decoration-signal"
+                className="relative underline decoration-line underline-offset-4 transition-colors duration-150 after:absolute after:-inset-x-1 after:-inset-y-[13px] after:content-[''] hover:decoration-signal"
               >
                 {e.company}
               </a>

@@ -48,9 +48,16 @@ export default function WorkCard({ project }: { project: Project }) {
         </h3>
       </div>
       <p className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[12px] tracking-[0.04em] text-faint tabular-nums">
-        <span className="uppercase">{p.ticker}</span>
+        {/*
+          Ticker and metric share one flex item so a long metric wraps
+          inside its own text instead of dropping the whole metric below a
+          lone ticker (the ml-3 stands in for the row's gap-x-3).
+        */}
         <span>
-          {p.metric.value} {p.metric.label}
+          <span className="uppercase">{p.ticker}</span>
+          <span className="ml-3">
+            {p.metric.value} {p.metric.label}
+          </span>
         </span>
         {award && (
           <span className="bg-flare px-1.5 py-0.5 text-[11px] font-medium text-ink">
