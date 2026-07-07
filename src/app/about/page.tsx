@@ -5,6 +5,18 @@ export const metadata: Metadata = {
   title: "About - Snehanshn Chowdhury",
   description:
     "Who Snehanshn Chowdhury is: bio, education, what he's building now, and how to reach him.",
+  alternates: { canonical: "/about" },
+  openGraph: {
+    title: "About - Snehanshn Chowdhury",
+    description:
+      "Who Snehanshn Chowdhury is: bio, education, what he's building now, and how to reach him.",
+    url: "/about",
+    siteName: "Snehanshn Chowdhury",
+    type: "website",
+    // The root segment's opengraph-image.png does not cascade past a page
+    // that declares its own openGraph object, so point at it explicitly.
+    images: [{ url: "/opengraph-image.png", width: 1200, height: 630 }],
+  },
 };
 
 /* Links still awaiting a real URL (`#todo` in content.ts) are not rendered. */

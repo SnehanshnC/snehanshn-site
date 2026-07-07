@@ -46,9 +46,25 @@ const plexMono = IBM_Plex_Mono({
   subsets: ["latin"],
 });
 
+// Unfurl contract: every route carries canonical + OpenGraph/Twitter tags
+// (a portfolio's first impression is usually a link card in iMessage/Slack/X).
+// The og:image is the static `opengraph-image.png` file convention beside
+// this file. Sub-pages override title/description/canonical/openGraph in
+// their own metadata exports - openGraph does NOT deep-merge, so each page
+// spells its object out in full.
 export const metadata: Metadata = {
+  metadataBase: new URL(site.url),
   title: site.title,
   description: site.description,
+  alternates: { canonical: "/" },
+  openGraph: {
+    title: site.title,
+    description: site.description,
+    url: "/",
+    siteName: site.title,
+    type: "website",
+  },
+  twitter: { card: "summary_large_image" },
 };
 
 export default function RootLayout({
