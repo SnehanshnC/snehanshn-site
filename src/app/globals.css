@@ -253,6 +253,17 @@ button,
 }
 
 /*
+ * Print / save-as-PDF: a work card must never straddle a page break -
+ * a sliced cover reads as broken on paper. Print-only media; the screen
+ * rendering and LCP path are untouched.
+ */
+@media print {
+  .work-card {
+    break-inside: avoid;
+  }
+}
+
+/*
  * The terminal input carries focus indication via the amber prompt and
  * caret; a form-field outline inside the terminal breaks the illusion.
  * (Focus is placed programmatically in a single-input modal, so no a11y
