@@ -24,7 +24,6 @@ export default function WorkCard({ project }: { project: Project }) {
       rel="noopener noreferrer"
       data-cursor={cursorLabel(p.link.label)}
       className="work-card group block"
-      aria-label={`${p.name} - ${p.tagline} (${p.link.label})`}
     >
       <div className="overflow-hidden border border-line">
         {/* TODO(snehanshn): real screenshot - add coverSrc in content.ts and swap it in here. */}
@@ -35,9 +34,17 @@ export default function WorkCard({ project }: { project: Project }) {
         />
       </div>
       <div className="mt-3 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+        {/*
+          The link's accessible name comes from its content (an aria-label
+          can never contain ALL the visible text - axe's
+          label-content-name-mismatch counts the ticker/metric line too, so
+          voice-control users could not say what they see). Only the link
+          kind rides along visually hidden.
+        */}
         <h3 className="text-[17px] font-medium">
           {p.name}
           <span className="text-faint"> · {p.tagline}</span>
+          <span className="sr-only"> ({p.link.label})</span>
         </h3>
       </div>
       <p className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[12px] tracking-[0.04em] text-faint tabular-nums">

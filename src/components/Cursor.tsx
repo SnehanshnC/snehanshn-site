@@ -25,6 +25,7 @@ const GROW = 18; // px, over unlabeled interactive targets
 const PILL_H = 27; // px, labeled pill height
 const PILL_PAD = 22; // px, label horizontal padding total
 const PILL_GAP = 16; // px, pill offset right of the pointer
+const EDGE = 4; // px, minimum clearance from the viewport's right/bottom edges
 const LERP = 0.32; // per-frame catch-up fraction at 60fps
 
 type Mode = "dot" | "grow" | "label" | "asleep";
@@ -116,6 +117,11 @@ export default function Cursor() {
       }
       if (!visible) {
         visible = true;
+        // Reappear under the pointer: without this snap, re-entering the
+        // window after a pointerleave lerps the pill in from wherever it
+        // faded out - a comet-dash across the whole page.
+        pos.x = target.x;
+        pos.y = target.y;
         applyMode();
       }
       readTarget(e.target as Element);
@@ -143,9 +149,14 @@ export default function Cursor() {
       const w = el.offsetWidth;
       const h = el.offsetHeight;
       // Centered when a dot; slides out to ride right of the pointer as a
-      // pill so the label never sits on top of what it points at.
-      const x = pos.x - w / 2 + side * (w / 2 + PILL_GAP);
-      const y = pos.y - h / 2;
+      // pill so the label never sits on top of what it points at. Clamped
+      // to the right/bottom viewport edges so the label stays readable on
+      // narrow windows (the pill compresses toward the pointer there).
+      const x = Math.min(
+        pos.x - w / 2 + side * (w / 2 + PILL_GAP),
+        window.innerWidth - w - EDGE
+      );
+      const y = Math.min(pos.y - h / 2, window.innerHeight - h - EDGE);
       const scale = pressed ? 0.86 : 1;
       el.style.transform = `translate3d(${x}px, ${y}px, 0) scale(${scale})`;
       raf = requestAnimationFrame(frame);

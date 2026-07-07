@@ -62,6 +62,18 @@ body {
 }
 
 /*
+ * The ring is amber on its first frame. Tailwind's `transition-colors`
+ * includes outline-color, so without a resting declaration the ring
+ * animates in from the element's text color (gray) over 150ms. Declaring
+ * it unconditionally leaves the transition no delta to animate.
+ */
+a,
+button,
+[role="button"] {
+  outline-color: var(--signal);
+}
+
+/*
  * The statement voice: Fraunces with its optical axis breathing at display
  * sizes. The italic carries the one emphasis word per page.
  */

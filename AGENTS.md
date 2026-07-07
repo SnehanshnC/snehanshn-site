@@ -27,6 +27,7 @@ Never reintroduce background noise (canvases, tickers, particle fields).
 
 `Nav.tsx` (name + one-word role, Work / Fun / About, the `>_` terminal doorway) and `Footer.tsx` (sign-off + links + "press /") frame every page via `layout.tsx`.
 `template.tsx` gives each route change a fast transform-only rise (`.page-in`); a fade there would delay the LCP paint.
+`ScrollRestorer.tsx` (mounted in `layout.tsx`) restores scroll positions on back/forward - Next 16's async re-render defeats the browser's native restore, so it records scrollY per history entry (index stamped into `history.state`, positions in `sessionStorage`) and re-applies after popstate once the document is tall enough. Link navigations still start at top.
 Every page's h1 is a `.statement` sentence with ONE italic emphasis word (`<em>`, amber).
 
 ## Design tokens (the day-desk palette)
@@ -56,12 +57,16 @@ Contrast rule: `--signal` is the darkest amber that passes AA on paper - never l
 - Use `tabular-nums` wherever numbers align vertically.
 
 LCP contract (do not regress - the h1 is the LCP element on every page):
-Fraunces loads without the SOFT/WONK axes (they double the bytes) and the italic is a SEPARATE `preload: false` family (`--font-fraunces-italic`, applied by `.statement em`), so italic bytes never gate the h1's big font-swap repaint.
+Fraunces loads without the SOFT/WONK axes (they double the bytes).
+The italic is a SEPARATE local family (`--font-fraunces-italic`, applied by `.statement em`): `src/app/fraunces-italic-subset.woff2`, a ~10KB Google Fonts `text=`-subset holding ONLY the emphasis words' glyphs.
+The italic's swap repaints the h1 and is therefore a fresh LCP candidate - the full 80KB italic was the last thing gating LCP (Lighthouse 93 vs 96 with the subset).
+If an emphasis word changes, re-fetch the subset with the new glyphs (curl command in `layout.tsx` above the `localFont` call) - a missing glyph silently falls back to Georgia italic.
 Adding weights/axes/subsets to any preloaded font must be justified against Lighthouse mobile LCP.
 
 ## The cursor (`src/components/Cursor.tsx`) - the signature
 
 A 10px amber dot follows the pointer (rAF + lerp, `LERP` 0.32); over a target carrying `data-cursor="label"` it morphs into a mono pill speaking that label, riding `PILL_GAP` 16px right of the pointer so it never covers what it points at.
+The pill is clamped inside the viewport's right and bottom edges (`EDGE` 4px, in `frame()`) so labels stay readable on laptop-width windows; when the pointer re-enters the window the position snaps to the pointer instead of lerping in from where it faded out.
 Label conventions: work cards say the link kind ("devpost ↗", "live ↗", "github ↗", "dorahacks ↗" - derived in `WorkCard.tsx`), contact links "<name> ↗", the terminal doorways "press /", the nav name the latency joke (`identity.latencyJoke`, "~2ms").
 Plain links/buttons without `data-cursor` just grow the dot (`GROW` 18px); text fields put it to sleep (native I-beam returns via CSS).
 
@@ -78,6 +83,7 @@ Commands: help, ls projects, open <slug>, goto <work|fun|about> (client-side `ro
 Night-desk styling (surface/void/grid tokens, `--flare` prompt) - on the light site it is the one dramatic contrast moment. Keep it dark.
 Fully keyboard operable: Tab completes commands and arguments (ambiguous → candidates printed), Enter runs, ArrowUp/Down recall history (persisted in `sessionStorage`), Escape or `exit` closes and focus returns to the pre-open element (`goto` skips the focus restore - the element belongs to the page being left).
 The input suppresses the global focus outline (`[data-terminal-input]` rule in globals.css); the amber prompt + caret carry focus. Command data all comes from `content.ts`.
+Body scroll is locked while the terminal is open (`overflow: hidden` effect on `open`; the output pane scrolls itself with `overscroll-contain`) - Escape must land you exactly where you pressed `/`.
 
 ## Covers (`src/components/Cover.tsx`)
 
