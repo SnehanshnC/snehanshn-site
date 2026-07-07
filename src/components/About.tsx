@@ -4,16 +4,13 @@ import Section from "./Section";
 export default function About() {
   return (
     <Section id="about" index="02" title="About">
-      <div className="grid gap-x-16 gap-y-12 lg:grid-cols-[4fr_5fr]">
+      <div className="grid gap-x-16 gap-y-12 lg:grid-cols-[5fr_7fr]">
         <div>
           <p className="max-w-prose text-[17px] leading-relaxed text-glow">
             {identity.bio}
           </p>
           <p className="mt-5 font-mono text-xs leading-relaxed text-noise">
             {identity.education}
-          </p>
-          <p className="mt-8 max-w-prose text-sm leading-relaxed text-noise">
-            {otherWins}
           </p>
         </div>
 
@@ -39,6 +36,9 @@ export default function About() {
           </ul>
         </div>
       </div>
+
+      {/* A footnote for the whole section, not the left column. */}
+      <p className="mt-12 text-sm leading-relaxed text-noise">{otherWins}</p>
     </Section>
   );
 }

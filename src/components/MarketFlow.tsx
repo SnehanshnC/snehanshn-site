@@ -6,8 +6,11 @@ import { useEffect, useRef } from "react";
  * The signature: a market-flow field drawn on raw canvas 2D.
  * Fine particles drift along curved routes between three unlabeled nodes;
  * every few seconds an arbitrage pulse traces a lit route in the accent
- * color and fades. Tuning parameters are documented in AGENTS.md - change
- * them there and here together.
+ * color and fades. The field also answers the visitor: particles near the
+ * pointer speed up along their arcs (desktop, hover-capable only), and a
+ * click on open canvas fires a pulse from the nearest node. Both are
+ * skipped under prefers-reduced-motion. Tuning parameters are documented
+ * in AGENTS.md - change them there and here together.
  */
 
 const SIGNAL = "242, 163, 60"; // --signal as r,g,b
@@ -20,14 +23,23 @@ const MOBILE_BREAKPOINT = 768;
 const PULSE_EVERY_MS: [number, number] = [4200, 7500];
 const PULSE_DURATION_MS = 1500;
 const PULSE_TRAIL = 0.22; // fraction of a route lit behind the pulse head
+const PULSE_PEAK_ALPHA = 0.75; // trail alpha at the head
+const PULSE_GLOW_RADIUS = 18; // head glow radius, px
 const DRIFT_SPEED = 0.000016; // particle progress per ms, base
+const POINTER_RADIUS = 120; // px of pointer influence
+const POINTER_BOOST = 1.9; // extra arc speed at the pointer's center
+const POINTER_LERP = 0.08; // per-frame easing toward/away from the boost
 
 type Vec = { x: number; y: number };
 
-/** Node anchors in unit space; drift is added per-frame. */
+/**
+ * Node anchors in unit space; drift is added per-frame.
+ * Node 0 sits low-left and node 1 high-center-right so the main arcs
+ * arch over and right of the hero copy block instead of behind it.
+ */
 const NODES: Vec[] = [
-  { x: 0.16, y: 0.66 },
-  { x: 0.52, y: 0.24 },
+  { x: 0.1, y: 0.78 },
+  { x: 0.58, y: 0.22 },
   { x: 0.86, y: 0.6 },
 ];
 
@@ -64,6 +76,8 @@ type Particle = {
   size: number;
   alpha: number;
   dir: 1 | -1;
+  /** Pointer-influence speed multiplier, eased toward its target each frame. */
+  boost: number;
 };
 
 type Pulse = {
@@ -82,6 +96,7 @@ export default function MarketFlow({ className }: { className?: string }) {
     if (!ctx) return;
 
     let raf = 0;
+    let running = false;
     let width = 0;
     let height = 0;
     let particles: Particle[] = [];
@@ -89,11 +104,13 @@ export default function MarketFlow({ className }: { className?: string }) {
     let nextPulseAt = 0;
     let visible = true;
     let hidden = false;
+    let pointer: Vec | null = null;
     let lastFrame = performance.now();
 
     const reducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
     ).matches;
+    const hoverCapable = window.matchMedia("(hover: hover)").matches;
 
     const rand = (lo: number, hi: number) => lo + Math.random() * (hi - lo);
 
@@ -107,6 +124,7 @@ export default function MarketFlow({ className }: { className?: string }) {
         size: rand(0.5, 1.4),
         alpha: rand(0.12, 0.4),
         dir: Math.random() > 0.5 ? 1 : -1,
+        boost: 1,
       }));
     }
 
@@ -152,11 +170,24 @@ export default function MarketFlow({ className }: { className?: string }) {
     }
 
     function drawParticles(now: number, dt: number) {
+      const r2 = POINTER_RADIUS * POINTER_RADIUS;
       for (const p of particles) {
-        p.t += p.dir * p.speed * DRIFT_SPEED * dt;
+        const pos = pointOn(p.edge, p.t, now);
+        // Particles near the pointer speed up along their arc - the field
+        // reacts the way a book of orders reacts to a trade.
+        let target = 1;
+        if (pointer) {
+          const dx = pos.x - pointer.x;
+          const dy = pos.y - pointer.y;
+          const d2 = dx * dx + dy * dy;
+          if (d2 < r2) {
+            target = 1 + POINTER_BOOST * (1 - Math.sqrt(d2) / POINTER_RADIUS);
+          }
+        }
+        p.boost += (target - p.boost) * POINTER_LERP;
+        p.t += p.dir * p.speed * p.boost * DRIFT_SPEED * dt;
         if (p.t > 1) p.t -= 1;
         if (p.t < 0) p.t += 1;
-        const pos = pointOn(p.edge, p.t, now);
         ctx!.beginPath();
         ctx!.arc(pos.x, pos.y, p.size, 0, Math.PI * 2);
         ctx!.fillStyle = `rgba(${TRACE}, ${p.alpha})`;
@@ -168,9 +199,18 @@ export default function MarketFlow({ className }: { className?: string }) {
       nextPulseAt = now + rand(PULSE_EVERY_MS[0], PULSE_EVERY_MS[1]);
     }
 
-    function startPulse(now: number) {
-      // Route: a permutation of the three nodes, two hops.
-      const order = [0, 1, 2].sort(() => Math.random() - 0.5);
+    function startPulse(now: number, startNode?: number) {
+      // Route: a permutation of the three nodes, two hops. A manual pulse
+      // (click) starts at the node nearest the click.
+      const order =
+        startNode === undefined
+          ? [0, 1, 2].sort(() => Math.random() - 0.5)
+          : [
+              startNode,
+              ...[0, 1, 2]
+                .filter((i) => i !== startNode)
+                .sort(() => Math.random() - 0.5),
+            ];
       const hops: { edge: number; reverse: boolean }[] = [];
       for (let i = 0; i < 2; i++) {
         const from = order[i];
@@ -223,18 +263,25 @@ export default function MarketFlow({ className }: { className?: string }) {
         ctx!.beginPath();
         ctx!.moveTo(a.x, a.y);
         ctx!.lineTo(b.x, b.y);
-        ctx!.strokeStyle = `rgba(${SIGNAL}, ${0.55 * strength * fade})`;
+        ctx!.strokeStyle = `rgba(${SIGNAL}, ${PULSE_PEAK_ALPHA * strength * fade})`;
         ctx!.lineWidth = 1 + strength * 1.2;
         ctx!.stroke();
       }
       // Head glow.
       if (progress <= 1) {
         const h = routePoint(head, now);
-        const glow = ctx!.createRadialGradient(h.x, h.y, 0, h.x, h.y, 14);
+        const glow = ctx!.createRadialGradient(
+          h.x,
+          h.y,
+          0,
+          h.x,
+          h.y,
+          PULSE_GLOW_RADIUS
+        );
         glow.addColorStop(0, `rgba(${SIGNAL}, 0.8)`);
         glow.addColorStop(1, `rgba(${SIGNAL}, 0)`);
         ctx!.beginPath();
-        ctx!.arc(h.x, h.y, 14, 0, Math.PI * 2);
+        ctx!.arc(h.x, h.y, PULSE_GLOW_RADIUS, 0, Math.PI * 2);
         ctx!.fillStyle = glow;
         ctx!.fill();
       }
@@ -269,11 +316,8 @@ export default function MarketFlow({ className }: { className?: string }) {
     }
 
     function frame(now: number) {
+      if (!running) return;
       raf = requestAnimationFrame(frame);
-      if (!visible || hidden) {
-        lastFrame = now;
-        return;
-      }
       const dt = Math.min(now - lastFrame, 48);
       lastFrame = now;
       ctx!.clearRect(0, 0, width, height);
@@ -282,31 +326,103 @@ export default function MarketFlow({ className }: { className?: string }) {
       drawPulse(now);
     }
 
+    /**
+     * The rAF loop only runs while the canvas is on screen and the tab is
+     * visible; pausing cancels it entirely rather than idling at 60Hz.
+     */
+    function updateRunning() {
+      const shouldRun = !reducedMotion && visible && !hidden;
+      if (shouldRun && !running) {
+        running = true;
+        const now = performance.now();
+        lastFrame = now;
+        // Don't fire a stale pulse the instant the field scrolls back in.
+        if (nextPulseAt < now && !pulse) schedulePulse(now);
+        raf = requestAnimationFrame(frame);
+      } else if (!shouldRun && running) {
+        running = false;
+        cancelAnimationFrame(raf);
+      }
+    }
+
     resize();
     const ro = new ResizeObserver(resize);
     ro.observe(canvas);
 
     const io = new IntersectionObserver(([entry]) => {
       visible = entry.isIntersecting;
+      updateRunning();
     });
     io.observe(canvas);
 
     const onVisibility = () => {
       hidden = document.hidden;
-      lastFrame = performance.now();
+      updateRunning();
     };
     document.addEventListener("visibilitychange", onVisibility);
 
+    // Pointer + click land on the hero section (the canvas sits under the
+    // copy block, which would otherwise swallow the events).
+    const host: HTMLElement = canvas.parentElement ?? canvas;
+
+    const onPointerMove = (e: PointerEvent) => {
+      const rect = canvas!.getBoundingClientRect();
+      pointer = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+    };
+    const onPointerLeave = () => {
+      pointer = null;
+    };
+    if (!reducedMotion && hoverCapable) {
+      host.addEventListener("pointermove", onPointerMove);
+      host.addEventListener("pointerleave", onPointerLeave);
+    }
+
+    const firePulse = (startNode?: number) => {
+      if (reducedMotion || pulse) return; // one active pulse, ever
+      const now = performance.now();
+      startPulse(now, startNode);
+    };
+
+    const onClick = (e: MouseEvent) => {
+      // Clicks on the copy or interactive elements keep their meaning.
+      if ((e.target as HTMLElement).closest("h1, p, a, button")) return;
+      const rect = canvas!.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const now = performance.now();
+      let nearest = 0;
+      let best = Infinity;
+      for (let i = 0; i < NODES.length; i++) {
+        const p = nodePos(i, now, width, height);
+        const d = (p.x - x) ** 2 + (p.y - y) ** 2;
+        if (d < best) {
+          best = d;
+          nearest = i;
+        }
+      }
+      firePulse(nearest);
+    };
+    if (!reducedMotion) host.addEventListener("click", onClick);
+
+    // The terminal's `pulse` command lands here.
+    const onCommandPulse = () => firePulse();
+    window.addEventListener("marketflow:pulse", onCommandPulse);
+
     if (!reducedMotion) {
       schedulePulse(performance.now());
-      raf = requestAnimationFrame(frame);
+      updateRunning();
     }
 
     return () => {
+      running = false;
       cancelAnimationFrame(raf);
       ro.disconnect();
       io.disconnect();
       document.removeEventListener("visibilitychange", onVisibility);
+      host.removeEventListener("pointermove", onPointerMove);
+      host.removeEventListener("pointerleave", onPointerLeave);
+      host.removeEventListener("click", onClick);
+      window.removeEventListener("marketflow:pulse", onCommandPulse);
     };
   }, []);
 

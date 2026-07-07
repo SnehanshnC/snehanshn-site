@@ -143,26 +143,30 @@ export const experience: Experience[] = [
   },
 ];
 
-/** Off the Clock: photo slots + currently ticker. All placeholders. */
+export type PhotoSlot = { alt: string; src?: string };
+
+/** Off the Clock: photo slots + currently ticker. Slots without `src` are not rendered. */
 export const offTheClock = {
-  // TODO(snehanshn): replace with real photos (src under /public, alt text).
+  // TODO(snehanshn): add real photos (src under /public, alt text) to light up the grid.
   photoSlots: [
     { alt: "Photo slot 1" },
     { alt: "Photo slot 2" },
     { alt: "Photo slot 3" },
     { alt: "Photo slot 4" },
-  ],
+  ] as PhotoSlot[],
   // TODO(snehanshn): keep this one line current.
   currently: "Currently: shipping at NovaFlow and rereading Flash Boys.",
-} as const;
+};
 
-/** Contact links. TODO(snehanshn): fill all four before launch. */
-export const contact = {
-  github: { label: "GitHub", href: "#todo" }, // TODO(snehanshn)
+export type ContactLink = { label: string; href: string };
+
+/** Contact links. Links whose href is still `#todo` are not rendered. */
+export const contact: Record<"github" | "linkedin" | "x" | "email", ContactLink> = {
+  github: { label: "GitHub", href: "https://github.com/SnehanshnC" },
   linkedin: { label: "LinkedIn", href: "#todo" }, // TODO(snehanshn)
   x: { label: "X", href: "#todo" }, // TODO(snehanshn)
   email: { label: "Email", href: "#todo" }, // TODO(snehanshn)
-} as const;
+};
 
 export const site = {
   title: "Snehanshn Chowdhury",
