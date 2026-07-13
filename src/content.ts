@@ -11,15 +11,6 @@ export type Award = {
   full: string;
 };
 
-/** Abstract cover motif drawn by Cover.tsx - one per project, says what the thing does. */
-export type CoverMotif =
-  | "depth" // stepped depth-chart line (trading infra)
-  | "routes" // fan of routed arrows (application automation)
-  | "graph" // nodes and edges (knowledge graphs)
-  | "blocks" // parquet block grid (data marketplace)
-  | "wave" // speech waveform (speaking coach)
-  | "pulse"; // EKG line (field medic)
-
 export type Project = {
   slug: string;
   /** 4-char instrument code - the market-desk whisper on cards and in the terminal. */
@@ -32,12 +23,6 @@ export type Project = {
   metric: { value: string; label: string; fromAward?: boolean };
   awards: Award[];
   link: { label: string; href: string };
-  /**
-   * Cover hue (CSS hue degrees) + motif for the designed abstract cover.
-   * Used only by the dormant WorkCard/Cover salvage - rung E's showcase
-   * slots are blank plug-and-play panels, not motifs (rung-e-pristine.md).
-   */
-  cover: { hue: number; motif: CoverMotif };
   /**
    * Rung E showcase media slot - BLANK plug-and-play until real assets land.
    * TODO(snehanshn): real screenshot/video per project - add { src, alt }
@@ -59,8 +44,6 @@ export type Experience = {
 
 export const identity = {
   name: "Snehanshn Chowdhury",
-  /** One-word role next to the name in the nav. */
-  navRole: "engineer",
   /**
    * The statement hero. Rendered as pre + <em>emphasis</em> + post.
    * Candidates considered:
@@ -109,7 +92,6 @@ export const projects: Project[] = [
     role: "Co-founder & lead infrastructure engineer, led an 8-person team",
     awards: [],
     link: { label: "GitHub", href: "https://github.com/yuno-research" },
-    cover: { hue: 226, motif: "depth" },
   },
   {
     slug: "algora",
@@ -121,7 +103,6 @@ export const projects: Project[] = [
       "Scrapes GitHub, LinkedIn, and job boards to build developer portfolios, match roles, and autofill applications. LLaMA-based skill extraction; +300% application throughput.",
     awards: [{ badge: "1st @ HackNYU '25", full: "1st Place Overall @ HackNYU 2025" }],
     link: { label: "Devpost", href: "https://devpost.com/software/algora" },
-    cover: { hue: 174, motif: "routes" },
   },
   {
     slug: "synapse",
@@ -141,7 +122,6 @@ export const projects: Project[] = [
       label: "Devpost",
       href: "https://devpost.com/software/synapse-2bs4hv",
     },
-    cover: { hue: 262, motif: "graph" },
   },
   {
     slug: "quarry",
@@ -153,7 +133,6 @@ export const projects: Project[] = [
       "Schema-only marketplace where AI agents preview datasets through DuckDB queries and buy slices with Solana x402 micropayments. Parquet pipelines with IPFS verification.",
     awards: [],
     link: { label: "Live site", href: "https://www.quarry-ai.net/" },
-    cover: { hue: 96, motif: "blocks" },
   },
   {
     slug: "instructifai",
@@ -174,7 +153,6 @@ export const projects: Project[] = [
       },
     ],
     link: { label: "DoraHacks", href: "https://dorahacks.io/buidl/22372" },
-    cover: { hue: 340, motif: "wave" },
   },
   {
     slug: "medify",
@@ -198,7 +176,6 @@ export const projects: Project[] = [
       label: "Devpost",
       href: "https://devpost.com/software/medify-khoaid",
     },
-    cover: { hue: 16, motif: "pulse" },
   },
 ];
 

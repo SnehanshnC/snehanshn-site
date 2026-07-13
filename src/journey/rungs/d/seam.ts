@@ -27,7 +27,8 @@ import type { BuildArrivalSeam } from "../../types";
 const BEAT = {
   emoji: { at: 0, dur: 0.1, spread: 0.08 }, // 1. emoji evaporate
   cards: { at: 0.1, dur: 0.16, spread: 0.1 }, // 2. feature cards dissolve
-  ctas: { at: 0.3, dur: 0.14 }, // 3. gradient pills fall quiet
+  skins: { at: 0.3, dur: 0.08 }, // 3a. pill chrome dies -> quiet text links...
+  ctas: { at: 0.36, dur: 0.14 }, // 3b. ...which leave with the decoration
   layer: { at: 0.42, dur: 0.26 }, // 4. Swiss world paints over the template
   pieces: { at: 0.46, dur: 0.2, spread: 0.2 }, // 4. ...and its grid settles
   type: { at: 0.6, dur: 0.26 }, // 5. display scale gains confidence
@@ -42,8 +43,18 @@ export const buildArrivalSeam: BuildArrivalSeam | null = ({
   to,
   rail,
 }) => {
-  const emoji = Array.from(from.querySelectorAll('span[aria-hidden="true"]'));
+  // Decorative emoji only: rung C's aria-hidden BUTTON SKINS (stacked
+  // bevel/pill paint layers) also match a bare span[aria-hidden], and
+  // evaporating them stripped the pills at the seam's opening pixel
+  // (integration finding) - the :not()s keep this a no-op change for any
+  // dress without those hooks.
+  const emoji = Array.from(
+    from.querySelectorAll(
+      'span[aria-hidden="true"]:not([data-c-skin-bevel]):not([data-c-skin-pill])',
+    ),
+  );
   const cards = Array.from(from.querySelectorAll("li"));
+  const skins = Array.from(from.querySelectorAll("[data-c-skin-pill]"));
   const ctas = Array.from(from.querySelectorAll("a, button"));
   const pieces = Array.from(to.querySelectorAll("[data-d-piece]"));
   const name = to.querySelector("[data-d-name]");
@@ -82,8 +93,24 @@ export const buildArrivalSeam: BuildArrivalSeam | null = ({
     );
   }
 
-  // 3. Gradient pills -> quiet: D has no hero links, so the CTAs simply
-  // stop shouting and leave with the rest of the decoration.
+  // 3a. Gradient pills -> quiet text links (the ADR's beat, now targetable
+  // against rung C's real skin layers): the pill chrome fades off first...
+  if (skins.length) {
+    tl.fromTo(
+      skins,
+      { opacity: 1 },
+      {
+        opacity: 0,
+        duration: BEAT.skins.dur,
+        ease: "none",
+        immediateRender: false,
+      },
+      BEAT.skins.at,
+    );
+  }
+
+  // 3b. ...then the quiet links leave with the rest of the decoration
+  // (D has no hero links to become).
   if (ctas.length) {
     tl.fromTo(
       ctas,
@@ -149,19 +176,31 @@ export const buildArrivalSeam: BuildArrivalSeam | null = ({
   );
 
   // This rung's rail re-dress (hairline - see ./rail-dress.css): flip the
-  // D-namespaced attribute the stylesheet keys on. Explicit NUMERIC
-  // endpoints, not set(): set() captures the prior state lazily, and a
-  // captured absent-attribute cannot be restored (verified: the attribute
-  // stuck at "d" after scrubbing back). 0 -> 1 renders exactly "0"/"1" at
-  // the endpoints in both directions; the stylesheet matches only "1", so
-  // the sliver of interpolated values inside this beat's window - and the
-  // "0" it leaves behind when scrubbed back out - keep the dress off.
+  // shared data-rail-dress attribute from C's value to ours (the rail
+  // dress protocol - one attribute, one owner per scroll position).
+  // Explicit fromTo endpoints, not set(): set() captures the prior state
+  // lazily, and a captured value cannot be trusted across the reduced-
+  // motion force-jump wiring; a micro-duration fromTo renders exactly
+  // "c"/"d" at its endpoints in both scrub directions (rung B's engine
+  // finding). The label color rides inline alongside, template white ->
+  // D's gray - chaining with the neighbor seams' label tweens.
   tl.fromTo(
     rail.root,
-    { attr: { "data-rail-d": 0 } },
+    { attr: { "data-rail-dress": "c" } },
     {
-      attr: { "data-rail-d": 1 },
+      attr: { "data-rail-dress": "d" },
       duration: BEAT.rail.dur,
+      immediateRender: false,
+    },
+    BEAT.rail.at,
+  );
+  tl.fromTo(
+    [rail.labelLess, rail.labelMore],
+    { color: "#ffffff" },
+    {
+      color: "#666666",
+      duration: BEAT.rail.dur,
+      ease: "none",
       immediateRender: false,
     },
     BEAT.rail.at,

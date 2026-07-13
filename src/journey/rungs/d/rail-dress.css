@@ -6,38 +6,41 @@
  * Global stylesheet (not a module: these rules target the shared rail's
  * stable data-attribute hooks, and CSS Modules reject selector blocks
  * with no local class). Imported by ./dress.tsx, so it still ships with
- * the rung. Every rule is gated on [data-rail-d="1"], which ONLY the
- * C->D seam flips (a reversible numeric fromTo, 0 -> 1 - see seam.ts) -
- * so the sheet is inert outside rung D's stretch of the journey, and
- * scrubbing back before the seam restores whatever dress the previous
- * rung gave the rail. The attribute is D-namespaced (no cross-rung value
- * handshake to get wrong) and VALUE-keyed on purpose: scrubbing back out
- * leaves it at "0", which a bare presence selector would still match.
+ * the rung.
+ *
+ * THE RAIL DRESS PROTOCOL (integration phase): every rule keys on the ONE
+ * shared attribute [data-rail-dress="d"], which ONLY the C->D seam flips
+ * (a reversible micro-duration attr fromTo, "c" -> "d" - see seam.ts).
+ * One attribute, one owner: rung C's pill rules stop matching the moment
+ * the value changes, and scrubbing back restores them exactly. Label
+ * COLOR is inline territory (each seam tweens it as choreography, white ->
+ * #666 here); this sheet owns label typography only.
  *
  * The input keeps Rail.module.css's 44px box - that is the tap floor -
  * and its focus outline: only track, thumb, and label typography change.
  */
 
-[data-journey-rail][data-rail-d="1"] [data-journey-rail-label] {
+[data-journey-rail][data-rail-dress="d"] [data-journey-rail-label] {
   font-family: var(--font-mono), ui-monospace, monospace;
   font-size: 10px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #666;
 }
 
-[data-journey-rail][data-rail-d="1"] [data-journey-rail-input] {
+[data-journey-rail][data-rail-dress="d"] [data-journey-rail-input] {
   -webkit-appearance: none;
   appearance: none;
   background: transparent;
 }
 
-[data-journey-rail][data-rail-d="1"] [data-journey-rail-input]::-webkit-slider-runnable-track {
+[data-journey-rail][data-rail-dress="d"]
+  [data-journey-rail-input]::-webkit-slider-runnable-track {
   height: 1px;
   background: #b3b3b3;
 }
 
-[data-journey-rail][data-rail-d="1"] [data-journey-rail-input]::-webkit-slider-thumb {
+[data-journey-rail][data-rail-dress="d"]
+  [data-journey-rail-input]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
   width: 12px;
@@ -48,12 +51,14 @@
   background: #111;
 }
 
-[data-journey-rail][data-rail-d="1"] [data-journey-rail-input]::-moz-range-track {
+[data-journey-rail][data-rail-dress="d"]
+  [data-journey-rail-input]::-moz-range-track {
   height: 1px;
   background: #b3b3b3;
 }
 
-[data-journey-rail][data-rail-d="1"] [data-journey-rail-input]::-moz-range-thumb {
+[data-journey-rail][data-rail-dress="d"]
+  [data-journey-rail-input]::-moz-range-thumb {
   width: 12px;
   height: 12px;
   border: none;

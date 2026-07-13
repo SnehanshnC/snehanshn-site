@@ -191,23 +191,6 @@ button,
   animation: rise-move 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-/*
- * Page transition: fast rise on every route change (template.tsx).
- * Transform-only - a fade would delay the LCP paint on initial load.
- */
-@keyframes page-in {
-  from {
-    transform: translateY(8px);
-  }
-  to {
-    transform: translateY(0);
-  }
-}
-
-.page-in {
-  animation: page-in 0.24s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
 /* Terminal overlay entrance (CSS so no animation library ships in the bundle). */
 @keyframes terminal-in {
   from {
@@ -224,41 +207,20 @@ button,
   animation: terminal-in 0.18s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-/*
- * Work-card hover: the cover motif answers the pointer. Transform-only,
- * fast, and skipped under reduced motion.
- */
-.work-card .cover-art {
-  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
-  transform-origin: 50% 60%;
-}
-
-@media (hover: hover) {
-  .work-card:hover .cover-art,
-  .work-card:focus-visible .cover-art {
-    transform: scale(1.035);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .rise,
   .rise-move,
-  .page-in,
   .terminal-in {
     animation: none;
-  }
-  .work-card .cover-art {
-    transition: none;
   }
 }
 
 /*
- * Print / save-as-PDF: a work card must never straddle a page break -
- * a sliced cover reads as broken on paper. Print-only media; the screen
- * rendering and LCP path are untouched.
+ * Print / save-as-PDF: a showcase card must never straddle a page break.
+ * Print-only media; the screen rendering and LCP path are untouched.
  */
 @media print {
-  .work-card {
+  [data-e-card] {
     break-inside: avoid;
   }
 }

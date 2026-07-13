@@ -17,6 +17,7 @@ import BreathingCta from "./BreathingCta";
 import Tape from "./Tape";
 import Motion from "./Motion";
 import styles from "./dress.module.css";
+import "./rail-dress.css";
 
 /*
  * RUNG E - PRISTINE: the Great Pole, the real portfolio

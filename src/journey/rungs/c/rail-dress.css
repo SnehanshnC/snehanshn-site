@@ -1,0 +1,72 @@
+/*
+ * RUNG C's rail dress - gradient pill (docs/adr/rung-c-ai-bland.md "Rail
+ * dress"): rounded track, purple->blue gradient fill, soft drop shadow,
+ * generic template sans on the labels.
+ *
+ * Global stylesheet (not a module: these rules target the shared rail's
+ * stable data-attribute hooks; CSS Modules reject selector blocks with no
+ * local class). Imported by ./dress.tsx, so it ships with the rung.
+ *
+ * THE RAIL DRESS PROTOCOL (integration phase): every rung's rail chrome
+ * keys on ONE shared attribute, [data-rail-dress="<rung id>"], flipped by
+ * that rung's arrival seam as a micro-duration attr fromTo (see seam.ts).
+ * One attribute means one owner per scroll position: when the C->D seam
+ * flips the value to "d", every rule here simply stops matching - no
+ * resets, no cross-rung specificity wars. Label COLOR is the exception:
+ * it is tweened inline by each seam (a color ride is part of several
+ * seams' choreography), so sheets stay color-silent on the labels.
+ *
+ * The input keeps Rail.module.css's 44px box - that is the tap floor -
+ * and its focus outline: only track, thumb, and label typography change.
+ */
+
+[data-journey-rail][data-rail-dress="c"] {
+  font-family:
+    Inter, "SF Pro Text", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 500;
+}
+
+[data-journey-rail][data-rail-dress="c"] [data-journey-rail-input] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+}
+
+[data-journey-rail][data-rail-dress="c"]
+  [data-journey-rail-input]::-webkit-slider-runnable-track {
+  height: 10px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #7c3aed, #2563eb);
+  box-shadow: 0 6px 20px rgba(76, 29, 149, 0.35);
+}
+
+[data-journey-rail][data-rail-dress="c"]
+  [data-journey-rail-input]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  margin-top: -6px; /* (10px track - 22px thumb) / 2 - centers on the pill */
+  border: none;
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(30, 27, 75, 0.45);
+}
+
+[data-journey-rail][data-rail-dress="c"]
+  [data-journey-rail-input]::-moz-range-track {
+  height: 10px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #7c3aed, #2563eb);
+  box-shadow: 0 6px 20px rgba(76, 29, 149, 0.35);
+}
+
+[data-journey-rail][data-rail-dress="c"]
+  [data-journey-rail-input]::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(30, 27, 75, 0.45);
+}

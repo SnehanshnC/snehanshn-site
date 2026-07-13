@@ -1,6 +1,7 @@
 import { journeyRungC } from "@/content";
 import LearnMoreButton from "./LearnMoreButton";
 import styles from "./dress.module.css";
+import "./rail-dress.css";
 
 /*
  * RUNG C - AI-BLAND: the soulless SaaS template (docs/adr/rung-c-ai-bland.md).

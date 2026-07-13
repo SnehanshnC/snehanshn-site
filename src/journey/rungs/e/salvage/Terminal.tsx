@@ -318,12 +318,27 @@ export default function Terminal() {
       close(false);
       const heading = document.getElementById(`${result.anchor}-title`);
       const section = document.getElementById(result.anchor);
-      heading?.focus({ preventScroll: true });
+      const reduceMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
       (section ?? heading)?.scrollIntoView({
-        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
-          ? "auto"
-          : "smooth",
+        behavior: reduceMotion ? "auto" : "smooth",
       });
+      // Focus lands when the scroll does, not before: until the section's
+      // reveal scrubs in, a rewound data-e-rise heading is
+      // visibility:hidden, and focusing a hidden element silently drops
+      // focus to <body> (integration finding - long goto jumps lost the
+      // handoff). By scrollend the heading has risen into view, so the
+      // focus ring lands somewhere visible. The timer is the fallback for
+      // engines without scrollend and for instant (reduced-motion) jumps.
+      let fallback = 0;
+      const landFocus = () => {
+        window.clearTimeout(fallback);
+        window.removeEventListener("scrollend", landFocus);
+        heading?.focus({ preventScroll: true });
+      };
+      fallback = window.setTimeout(landFocus, reduceMotion ? 50 : 2500);
+      window.addEventListener("scrollend", landFocus, { once: true });
       return;
     }
     if (result.exit) {
