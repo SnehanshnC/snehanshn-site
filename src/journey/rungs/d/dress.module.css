@@ -1,0 +1,108 @@
+/*
+ * RUNG D - SAFE: the Swiss editorial hero (docs/adr/rung-d-safe.md).
+ *
+ * Strictly grayscale, completely static - the two structural tells that
+ * keep D distinguishable from E. Neutral raw hexes on purpose: the site's
+ * warm paper/ink tokens are E's identity, and D pre-spending them would
+ * soften the detonation's color flood.
+ *
+ * Type is the "Inter-class" neutral sans as a pure system stack: the rung
+ * may not add font bytes (the LCP contract belongs to rung E's h1), and
+ * local Inter / SF Pro / Segoe are exactly the voiceless quality face the
+ * ADR wants. Weight 600 resolves to a true semibold on every platform
+ * that has one.
+ */
+
+.root {
+  position: relative;
+  height: 100%;
+  background: #fafafa;
+  color: #111;
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+}
+
+/*
+ * The disciplined grid: name row / role block / meta row distributed over
+ * the full viewport. Bottom padding is larger than the sides on purpose -
+ * the rail (fixed, labels + 44px input) floats over the stage's bottom
+ * edge, and the meta row must sit fully above it (Journey.module.css:
+ * dresses keep critical content out of the bottom edge).
+ */
+.frame {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  padding: clamp(24px, 5vw, 72px);
+  padding-bottom: clamp(84px, 12vh, 112px);
+}
+
+.row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.row:last-child {
+  align-items: flex-end;
+}
+
+/* Display: 600, clamp(3rem -> 5.5rem), tracking -0.03em (ADR "Typography"). */
+.name {
+  font-weight: 600;
+  font-size: clamp(3rem, 9.5vw, 5.5rem);
+  line-height: 0.98;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+.nameLine {
+  display: block;
+}
+
+/* Body: 400, 1rem/1.6 (ADR). Two quiet sentences; the second aims at rung E. */
+.role {
+  max-width: 34ch;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* Meta: mono 400, 0.75rem, uppercase (ADR) - #666 is 5.7:1 on #fafafa (AA). */
+.meta {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #666;
+}
+
+/*
+ * The residual-hue veil - a SEAM prop, not part of D's dress proper. The
+ * C->D seam fades rung D in underneath this wash so the template's
+ * purple->blue hue still hangs over the recomposed Swiss world, then
+ * drains it to 0 as the FINAL beat: arriving at D is the exact moment
+ * color leaves (docs/adr/rung-d-safe.md "drain color last"). Authored
+ * visible so progress 0 of the seam - including the reduced-motion
+ * force-jump back - restores the hued world without a tween.
+ */
+.tint {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    135deg,
+    rgba(126, 87, 235, 0.2),
+    rgba(59, 130, 246, 0.16)
+  );
+}

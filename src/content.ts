@@ -388,6 +388,7 @@ export const journeyRungC = {
 
 /* ---- RUNG D - SAFE (docs/adr/rung-d-safe.md) ----------------------------- */
 export const journeyRungD = {
+  // TODO(snehanshn): final copy polish (rung D ADR open item).
   name: ["SNEHANSHN", "CHOWDHURY"],
   role: ["Software engineer.", "Selected work below."],
   /** Tiny mono meta labels on the Swiss grid. */
