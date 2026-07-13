@@ -1,34 +1,48 @@
 import { journeyRungB } from "@/content";
-import { meta } from "./meta";
+import Marquee from "./Marquee";
+import styles from "./dress.module.css";
 
 /*
  * RUNG B - KITSCH: effort without taste (docs/adr/rung-b-kitsch.md).
  *
- * STUB DRESS - a plain rendering of the rung's copy so the scaffold's
- * dwell is visible. The rung B task replaces this file's internals with
- * the real dress: marquee headline (STATIC under reduced motion), centered
- * shout-stack, lime-on-magenta, silver bevel buttons with a press effect
- * but no action (aria-disabled, never a focus trap).
+ * The centered shout-stack: marquee headline, shouted body lines, gray 3D
+ * bevel buttons - the same five facts as rung A, now SHOUTED, in the
+ * lime-on-magenta crime. Two artifacts only per the ADR's restraint rule
+ * (marquee + bevel/clash backbone); rejected artifacts (hit counter,
+ * sparkle cursor) stay rejected.
  *
- * Contract: visuals here; the A->B beat list in ./seam.ts (including this
- * rung's rail re-dress via SeamContext.rail); scroll spans in ./meta.ts;
- * copy in the journeyRungB block in src/content.ts. Heading level note:
- * the document h1 is rung E.0's statement (ADR 0002 "SEO") - keep this
- * layer's headline a paragraph or a lower-level heading.
+ * Semantics under the costume (ADR 0002 constraint 6): a real heading
+ * (h2 - the document h1 is rung E.0's statement), real paragraphs, real
+ * <button>s. The buttons are decorative on purpose - CSS press-effect,
+ * no action, aria-disabled so SR users get the joke without a trap:
+ * nothing works well on the bad pole (consistent with rung A's inert
+ * non-link).
+ *
+ * Contract: visuals here; the A->B beat list in ./seam.ts (including the
+ * rail's bevel re-dress); scroll spans in ./meta.ts; copy in the
+ * journeyRungB block in src/content.ts.
  */
 export default function RungBDress() {
   return (
-    <div className="grid h-full place-content-center gap-4 bg-[#fdf3fb] p-6 text-center">
-      <p className="font-mono text-[11px] tracking-[0.14em] uppercase text-faint">
-        rung {meta.id.toUpperCase()} · {meta.name} · stub dress
-      </p>
-      <p className="text-2xl font-medium">{journeyRungB.headline}</p>
-      {journeyRungB.body.map((line) => (
-        <p key={line}>{line}</p>
-      ))}
-      <p className="font-mono text-sm text-faint">
-        [ {journeyRungB.buttons.join(" ]  [ ")} ]
-      </p>
+    <div className={styles.root}>
+      <Marquee />
+      <div className={styles.body}>
+        {journeyRungB.body.map((line) => (
+          <p key={line}>{line}</p>
+        ))}
+      </div>
+      <div className={styles.buttons}>
+        {journeyRungB.buttons.map((label) => (
+          <button
+            key={label}
+            type="button"
+            className={styles.button}
+            aria-disabled="true"
+          >
+            {label}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }

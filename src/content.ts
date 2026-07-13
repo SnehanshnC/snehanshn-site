@@ -363,6 +363,7 @@ export const journeyRungA = {
 } as const;
 
 /* ---- RUNG B - KITSCH (docs/adr/rung-b-kitsch.md) ------------------------ */
+// TODO(snehanshn): final copy polish (rung B ADR open item).
 export const journeyRungB = {
   /** Marquee headline; the decorative arrows are dress, not copy. */
   headline: "WELCOME TO MY AWESOME SITE!!",

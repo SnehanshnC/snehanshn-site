@@ -1,0 +1,243 @@
+/*
+ * RUNG B - KITSCH: effort without taste (docs/adr/rung-b-kitsch.md).
+ *
+ * The lime-on-magenta crime, dead-centered, tacky text-shadow, Comic Sans
+ * everywhere - deliberate badness, authored (ADR 0002 constraint 6). The
+ * palette is ADR-fixed and intentionally fails tasteful-contrast rules;
+ * the layer is visibility-hidden at load (Lighthouse audits rung A) and
+ * the semantics underneath stay correct.
+ *
+ * Two artifacts only (the ADR's restraint rule): the marquee headline and
+ * the bevel+clash backbone. Nothing else moves.
+ */
+
+.root {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(14px, 3vh, 26px);
+  padding: 24px 0;
+  overflow: hidden;
+  background: #ff00cc;
+  color: #aaff00;
+  font-family: "Comic Sans MS", "Comic Sans", "Chalkboard SE", cursive;
+  text-align: center;
+}
+
+/* ---- The marquee headline (artifact 1) --------------------------------- */
+
+.marquee {
+  align-self: stretch;
+  overflow: hidden;
+}
+
+/*
+ * Static truth - pre-punchline, reduced motion, and no-JS all read this: a
+ * wrapped, centered shout, never a clipped strip (every rung stays legible,
+ * ADR 0002 constraint 3). The arrival seam's LAST beat sets data-b-on and
+ * the strip becomes the loop.
+ */
+.strip {
+  margin: 0;
+  padding: 0 12px;
+  font-size: clamp(30px, 7vw, 64px);
+  font-weight: 700;
+  line-height: 1.15;
+  color: #aaff00;
+  text-shadow: 4px 4px 0 #00ffff;
+}
+
+.copy {
+  display: inline;
+}
+
+/* The seamless-loop duplicate stays out of static/wrapped layout. */
+.copy + .copy {
+  display: none;
+}
+
+[data-b-on="on"] .strip {
+  display: flex;
+  width: max-content;
+  padding: 0;
+  white-space: nowrap;
+  animation: b-marquee-slide 14s linear infinite;
+  /* Runs only while rung B owns the viewport - see [data-b-live] below. */
+  animation-play-state: paused;
+}
+
+/* Identical copies + translateX(-50%) = exact one-copy wrap, no jump. */
+[data-b-on="on"] .copy {
+  display: block;
+  padding-right: 0.75em;
+}
+
+[data-b-on="on"] .copy + .copy {
+  display: block;
+}
+
+/*
+ * Perf gate: Marquee.tsx toggles data-b-live from the journey progress
+ * store (activeRung === "b"), so the infinite loop never ticks behind
+ * rungs C/D/E once the B->C seam has faded this layer out.
+ */
+[data-b-on="on"][data-b-live] .strip {
+  animation-play-state: running;
+}
+
+@keyframes b-marquee-slide {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/*
+ * Belt and braces: the seam builder already skips the data-b-on beat under
+ * reduced motion (the marquee must be STATIC - rung-b-kitsch.md), but the
+ * media block guarantees it even if the attribute ever lands.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .strip {
+    animation: none !important;
+  }
+}
+
+/* ---- The shout-stack body ---------------------------------------------- */
+
+.body {
+  display: grid;
+  gap: 6px;
+  padding: 0 16px;
+}
+
+.body p {
+  margin: 0;
+  font-size: clamp(19px, 2.4vw, 27px);
+  font-weight: 700;
+  text-shadow: 2px 2px 0 #00ffff;
+}
+
+/* ---- The gray 3D bevel buttons (artifact 2) ----------------------------- */
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 18px;
+  padding: 0 16px;
+}
+
+/*
+ * Decorative on purpose: real <button>s (focusable, announced, aria-disabled
+ * keeps the joke intact for SR users) with a CSS press-effect and no action -
+ * nothing works well on the bad pole. No transitions: state flips instantly,
+ * authentically. 44px tap floor in px per the repo's ergonomics rule.
+ */
+.button {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 10px 26px;
+  font-family: inherit;
+  font-size: clamp(17px, 1.6vw, 21px);
+  font-weight: 700;
+  color: #cc0000;
+  text-shadow: 1px 1px 0 #ffffff;
+  background: linear-gradient(180deg, #fdfdfd 0%, #d2d2d2 55%, #b0b0b0 100%);
+  border: 4px outset #e3e3e3;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.button:active {
+  border-style: inset;
+  background: linear-gradient(180deg, #b3b3b3 0%, #d8d8d8 100%);
+  transform: translate(1px, 2px);
+}
+
+/* Focus outlines are never hidden - kitsch just makes them louder. */
+.button:focus-visible {
+  outline: 4px dashed #00ffff;
+  outline-offset: 3px;
+}
+
+/* ---- Rail re-dress: bevel-kitsch (rung-b-kitsch.md "Rail dress") -------- */
+
+/*
+ * The arrival seam SETS data-rail-dress="b" on the rail root (via
+ * SeamContext.rail) - these attribute-keyed rules are the chrome that
+ * switch flips on. Attribute-keyed because a native range's track/thumb
+ * live in pseudo-elements no inline style can reach. Convention for later
+ * rungs: overwrite the same data-rail-dress attribute with your own value -
+ * GSAP's attr reversal restores "b" on scroll-back, so the cascade flips
+ * both ways without any shared-file edit.
+ *
+ * The input keeps Rail.module.css's 44px hit box; only the rendered
+ * track/thumb are re-dressed.
+ */
+
+:global([data-journey-rail][data-rail-dress="b"]) {
+  font-family: "Comic Sans MS", "Comic Sans", "Chalkboard SE", cursive;
+  font-weight: 700;
+  text-shadow: 1px 1px 0 #00ffff;
+}
+
+:global([data-journey-rail][data-rail-dress="b"] [data-journey-rail-input]) {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+}
+
+:global(
+    [data-journey-rail][data-rail-dress="b"] [data-journey-rail-input]
+  )::-webkit-slider-runnable-track {
+  height: 18px;
+  background: linear-gradient(180deg, #f2f2f2, #a8a8a8);
+  border: 3px outset #dcdcdc;
+  border-radius: 2px;
+}
+
+:global(
+    [data-journey-rail][data-rail-dress="b"] [data-journey-rail-input]
+  )::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 34px;
+  height: 30px;
+  margin-top: -9px;
+  background: linear-gradient(180deg, #ffffff, #ababab);
+  border: 3px outset #e8e8e8;
+  border-radius: 3px;
+  box-shadow: 1px 1px 0 #7a7a7a;
+}
+
+:global(
+    [data-journey-rail][data-rail-dress="b"] [data-journey-rail-input]
+  )::-moz-range-track {
+  height: 12px;
+  background: linear-gradient(180deg, #f2f2f2, #a8a8a8);
+  border: 3px outset #dcdcdc;
+  border-radius: 2px;
+}
+
+:global(
+    [data-journey-rail][data-rail-dress="b"] [data-journey-rail-input]
+  )::-moz-range-thumb {
+  width: 34px;
+  height: 30px;
+  background: linear-gradient(180deg, #ffffff, #ababab);
+  border: 3px outset #e8e8e8;
+  border-radius: 3px;
+}
+
+/* Focus stays visible on the beveled rail (cyan reads on magenta). */
+:global(
+    [data-journey-rail][data-rail-dress="b"] [data-journey-rail-input]
+  ):focus-visible {
+  outline: 3px dashed #00ffff;
+  outline-offset: 2px;
+}
