@@ -375,8 +375,20 @@ export const journeyRungB = {
 /* ---- RUNG C - AI-BLAND (docs/adr/rung-c-ai-bland.md) -------------------- */
 export const journeyRungC = {
   hero: "🚀 Results-driven engineer shipping impactful solutions.",
+  /** The template sub-line - fades in last with the cards (ADR seam beat 6). */
+  subline:
+    "Leveraging cutting-edge technology to craft seamless digital experiences ✨",
   /** The journey's first working interactions: mailto + smooth-scroll forward. */
   ctas: { getInTouch: "Get in touch", learnMore: "Learn more" },
+  /**
+   * [Get in touch]'s real mailto (ADR: "C works, hollowly"). Follows
+   * contact.email so filling that TODO upgrades this automatically; until
+   * then the anchor opens a blank compose - real mechanism, empty target,
+   * which is exactly this rung's character.
+   */
+  getInTouchHref: contact.email.href.startsWith("mailto:")
+    ? contact.email.href
+    : "mailto:",
   /** The three-emoji-card row - the signature template tell. */
   cards: [
     { emoji: "✨", title: "Clean code" },
