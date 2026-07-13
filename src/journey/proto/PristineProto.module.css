@@ -80,6 +80,16 @@
   pointer-events: none;
 }
 
+/*
+ * The re-hued copy must occupy the exact same box as the gray layer's
+ * pitch (act 1 is COLOR only - rows may not shift). Without this the
+ * wrapper is auto-height and the pitch's `height: 100%` collapses.
+ */
+.huedCopy {
+  position: absolute;
+  inset: 0;
+}
+
 /* The warm lamp at the flood's origin - painted once, never animated. */
 .floodGlow {
   position: absolute;
@@ -110,6 +120,8 @@
   justify-content: space-between;
   height: 100%;
   padding: clamp(24px, 5vw, 72px);
+  /* The name must clear the fixed proto badge (44px) on narrow screens. */
+  padding-top: clamp(56px, 5vw, 72px);
 }
 
 .dRow {

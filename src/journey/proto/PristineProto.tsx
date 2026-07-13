@@ -256,7 +256,7 @@ export default function PristineProto({ variant }: { variant: ProtoVariant }) {
 
           <div className={styles.dHued} data-proto-hued aria-hidden>
             <div className={styles.floodGlow} />
-            <div data-proto-hued-copy>
+            <div className={styles.huedCopy} data-proto-hued-copy>
               <DPitch />
             </div>
           </div>
