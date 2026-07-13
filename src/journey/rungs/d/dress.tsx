@@ -1,38 +1,65 @@
 import { journeyRungD } from "@/content";
-import { meta } from "./meta";
+import styles from "./dress.module.css";
+import "./rail-dress.css";
 
 /*
- * RUNG D - SAFE: genuinely well-made, grayscale, static (docs/adr/rung-d-safe.md).
+ * RUNG D - SAFE: genuinely well-made, grayscale, static
+ * (docs/adr/rung-d-safe.md "Composition - Swiss editorial hero").
  *
- * STUB DRESS - a plain rendering of the rung's copy so the scaffold's
- * dwell is visible. The rung D task replaces this file's internals with
- * the real dress: ~#fafafa / ~#111 Swiss grid, Inter-class display scale
- * (clamped so 390px never overflows), tiny uppercase mono meta labels.
- * Strictly grayscale and completely static - D banks color and motion so
- * the D->E detonation can spend them.
+ *   SNEHANSHN                 ·001
+ *   CHOWDHURY
+ *
+ *   Software engineer.
+ *   Selected work below.
+ *
+ *   New Jersey                2026
  *
  * Contract: visuals here; the C->D beat list in ./seam.ts (including this
  * rung's rail re-dress via SeamContext.rail); scroll spans in ./meta.ts;
- * copy in the journeyRungD block in src/content.ts. Heading level note:
- * the document h1 is rung E.0's statement (ADR 0002 "SEO") - keep this
- * layer's name block a paragraph or a lower-level heading.
+ * copy in the journeyRungD block in src/content.ts.
+ *
+ * Semantics under the costume (ADR 0002 constraint 6): everything is a
+ * paragraph - the document h1 is rung E.0's statement, and a lower-level
+ * heading here would put the name above E's h1 in the outline for no
+ * reader benefit. No interactive elements: D is a doorway ("Selected work
+ * below." aims at rung E), not a dead end with dead links.
+ *
+ * data-d-piece marks the five composition pieces the arrival seam settles
+ * (transform-only, in DOM order); data-d-name is the display-scale beat's
+ * target; data-d-tint is the seam's residual-hue veil (a seam prop - see
+ * dress.module.css - decorative, hidden from AT).
  */
 export default function RungDDress() {
   return (
-    <div className="grid h-full place-content-center gap-4 bg-[#fafafa] p-6 text-center text-[#111]">
-      <p className="font-mono text-[11px] tracking-[0.14em] uppercase text-[#666]">
-        rung {meta.id.toUpperCase()} · {meta.name} · stub dress
-      </p>
-      <p className="text-3xl font-semibold tracking-tight">
-        {journeyRungD.name.join(" ")}
-      </p>
-      {journeyRungD.role.map((line) => (
-        <p key={line}>{line}</p>
-      ))}
-      <p className="font-mono text-xs uppercase tracking-[0.14em] text-[#666]">
-        {journeyRungD.meta.index} · {journeyRungD.meta.location} ·{" "}
-        {journeyRungD.meta.year}
-      </p>
+    <div className={styles.root}>
+      <div className={styles.frame}>
+        <div className={styles.row}>
+          <p className={styles.name} data-d-piece data-d-name>
+            {journeyRungD.name.map((line) => (
+              <span key={line} className={styles.nameLine}>
+                {line}
+              </span>
+            ))}
+          </p>
+          <p className={styles.meta} data-d-piece>
+            {journeyRungD.meta.index}
+          </p>
+        </div>
+        <div className={styles.role} data-d-piece>
+          {journeyRungD.role.map((line) => (
+            <p key={line}>{line}</p>
+          ))}
+        </div>
+        <div className={styles.row}>
+          <p className={styles.meta} data-d-piece>
+            {journeyRungD.meta.location}
+          </p>
+          <p className={styles.meta} data-d-piece>
+            {journeyRungD.meta.year}
+          </p>
+        </div>
+      </div>
+      <div className={styles.tint} data-d-tint aria-hidden="true" />
     </div>
   );
 }
