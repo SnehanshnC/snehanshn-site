@@ -1,28 +1,105 @@
 import type { BuildArrivalSeam } from "../../types";
 
 /*
- * The D->E seam - the three-act detonation (docs/adr/rung-e-pristine.md):
- *   Act 1 - COLOR: hue floods from one point outward; grayscale dies.
- *   Act 2 - VOICE: neutral sans -> editorial serif snap; copy rewrites to
- *           max hard sell.
- *   Act 3 - LIFE: micro-motion wakes, the cursor pill wakes, the stage
- *           unpins (the seam's end coincides with the sticky release -
- *           see ./meta.ts), and E.0 rises into view.
- * The rung E task authors that beat list here (plus the rail's refined
- * final dress via ctx.rail), normalized to [0, 1] with explicit endpoints
- * (fromTo / set) and `immediateRender: false` - see SeamContext in
- * src/journey/types.ts. Note `to` is rung E's FLOW root below the stage,
- * not a stage layer - it is already visible in document flow (SSR/SEO)
- * and must never default to hidden.
+ * The D->E seam - the three-act detonation (docs/adr/rung-e-pristine.md),
+ * refined from the picked evolved-paper prototype (PR #15) per the ADR's
+ * decided mechanics:
  *
- * STUB: the outgoing stage dress fades late in the seam so the stage
- * hands the viewport to E's flowing content as it unpins.
+ *   Act 1 - COLOR (this file). A transform-scaled, pre-painted bloom layer
+ *   (paper core, amber wavefront - painted once in dress.module.css, no
+ *   animated clip-path, no filters) detonates from D's name block with
+ *   power4.in: warmth pools at the emphasis point, then floods the
+ *   viewport. Grayscale dies underneath it. The flash then cools: the
+ *   bloom fades into the body's own identical warm paper, so the stage is
+ *   pristine blank sheet as it unpins - the unpin itself is invisible.
+ *
+ *   Act 2 - VOICE and Act 3 - LIFE live in the dress (Motion.tsx), scrubbed
+ *   by E.0's own rise through the viewport: the serif statement's chars
+ *   materialize from print slices inside clipped lines as the section
+ *   arrives, the amber thread draws, mono labels slide in from alternating
+ *   sides, and the cursor pill wakes last (../e/wake.ts). Splitting the
+ *   acts across the unpin is what kills the "same statement twice" seam
+ *   artifact: the stage never shows a statement, so E.0's h1 is the one
+ *   and only voice moment. The ADR's ordering survives: color inside the
+ *   pinned span, voice as the serif lands mid-rise, life as it settles.
+ *
+ * The rail takes its refined final dress here as discrete snap beats
+ * (mono labels, amber accent) right as the flood peaks - legitimate snap
+ * beats per ADR 0002. Everything is authored fromTo/set with
+ * `immediateRender: false`, normalized to [0, 1], exactly reversible, and
+ * collapses to end states under the driver's reduced-motion force-jump.
  */
-export const buildArrivalSeam: BuildArrivalSeam | null = ({ tl, from }) => {
+export const buildArrivalSeam: BuildArrivalSeam | null = ({
+  tl,
+  from,
+  to,
+  rail,
+}) => {
+  // The bloom layers live in the dress (fixed, aria-hidden, CSS-hidden by
+  // default so no-JS never sees them); `to` is rung E's flow root.
+  const bloom = to.querySelector<HTMLElement>("[data-e-bloom]");
+  const glow = to.querySelector<HTMLElement>("[data-e-glow]");
+
+  if (bloom) {
+    // Ignition: the fleck appears...
+    tl.fromTo(
+      bloom,
+      { autoAlpha: 0 },
+      { autoAlpha: 1, duration: 0.02, immediateRender: false },
+      0.04,
+    );
+    // ...then detonates - a point-source zoom, not a crossfade. The layer
+    // is pre-painted at rest scale 1, so the end state is crisp and the
+    // zoom is pure compositor work.
+    tl.fromTo(
+      bloom,
+      { scale: 0.004 },
+      { scale: 1, duration: 0.48, ease: "power4.in", immediateRender: false },
+      0.06,
+    );
+    // The flash cools: paper fades into the body's identical paper, so
+    // the world simply IS warm now. Scrubbed back, it re-ignites.
+    tl.to(bloom, { autoAlpha: 0, duration: 0.22, ease: "none" }, 0.76);
+  }
+
+  if (glow) {
+    // The warm lamp pooling at the detonation point - strongest while the
+    // wavefront crosses the viewport, cooling away with the bloom.
+    tl.fromTo(
+      glow,
+      { autoAlpha: 0 },
+      { autoAlpha: 1, duration: 0.3, ease: "power2.in", immediateRender: false },
+      0.12,
+    );
+    tl.to(glow, { autoAlpha: 0, duration: 0.24, ease: "power1.inOut" }, 0.74);
+  }
+
+  // Grayscale dies under the flood: D's layer fades while the opaque core
+  // is passing over it, so the removal itself is never visible.
   tl.fromTo(
     from,
     { autoAlpha: 1 },
-    { autoAlpha: 0, duration: 0.4, ease: "none", immediateRender: false },
-    0.6,
+    { autoAlpha: 0, duration: 0.2, ease: "power2.in", immediateRender: false },
+    0.4,
   );
+
+  // The rail's refined final form, snapped in as the flood peaks (its
+  // labels re-voice at the seam midpoint via activeRung, same moment).
+  // Inline snaps only - the native range keeps UA geometry; amber arrives
+  // through accent-color. Set beats revert cleanly on reverse scrub.
+  tl.set(
+    rail.root,
+    {
+      fontFamily: "var(--font-plex-mono), monospace",
+      fontSize: "11px",
+      letterSpacing: "0.14em",
+      textTransform: "uppercase",
+      color: "var(--faint)",
+    },
+    0.5,
+  );
+  tl.set(rail.input, { accentColor: "var(--signal)" }, 0.5);
+
+  // Pad to 1 so the cool-down maps onto the seam's whole scroll span.
+  tl.to({}, { duration: 0 }, 1);
 };

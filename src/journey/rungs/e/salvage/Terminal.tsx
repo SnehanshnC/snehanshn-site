@@ -1,25 +1,34 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
-import { contact, identity, otherWins, projects } from "@/content";
+import { contact, identity, journeyRungE, otherWins, projects } from "@/content";
+import { subscribeJourneyProgress } from "@/journey/progress";
 
 /*
- * The surprise beat: press `/` anywhere (or the `>_` button in the nav,
- * or "press /" in the footer) and a night-desk terminal opens over the
- * paper - the one dramatic dark moment on the site, the market-desk
- * heritage in a box. Fully keyboard-operable: type, Tab to complete,
- * Enter, ArrowUp/Down for history (persisted for the session), Escape
- * or `exit` to close.
+ * The surprise beat: press `/` (or the `>_` doorway in E.0's meta row, or
+ * "press /" in the endcap) and a night-desk terminal opens over the paper
+ * - the one dramatic dark moment on the site, the market-desk heritage in
+ * a box. Salvaged as rung E's easter egg (rung-e-pristine.md): the `/`
+ * key only answers once the journey has arrived at rung E - the terminal
+ * belongs to the destination, not to the costumes on the way there.
+ * Fully keyboard-operable: type, Tab to complete, Enter, ArrowUp/Down for
+ * history (persisted for the session), Escape or `exit` to close.
+ * `goto` jumps to E's sections (the old work/fun/about routes are gone -
+ * their 301s land on these anchors too).
  */
 
 type Line = { kind: "input" | "output"; text: string };
+
+/** The banner types itself in (punctuation-aware pacing); SR reads it once. */
+const BANNER = "snehanshn.com - type help to begin";
+
+const SECTION_IDS = journeyRungE.sections.map((s) => s.id);
 
 const HELP = `commands:
   help              this list
   ls projects       what I've built
   open <project>    open a project's link
-  goto <page>       go to work / fun / about
+  goto <section>    ${SECTION_IDS.join(" / ")}
   cat awards        the trophy cabinet, quietly
   whoami            who is this guy
   sudo hire-me      escalate privileges
@@ -38,17 +47,11 @@ const COMMANDS = [
   "whoami",
 ];
 
-const PAGES: Record<string, string> = {
-  work: "/",
-  fun: "/fun",
-  about: "/about",
-};
-
 /** Argument completions per command, for Tab. */
 const COMMAND_ARGS: Record<string, string[]> = {
   ls: ["projects"],
   open: projects.map((p) => p.slug),
-  goto: Object.keys(PAGES),
+  goto: SECTION_IDS,
   cat: ["awards"],
   sudo: ["hire-me"],
 };
@@ -102,7 +105,7 @@ function complete(
 function runCommand(raw: string): {
   output: string;
   url?: string;
-  route?: string;
+  anchor?: string;
   exit?: boolean;
   clear?: boolean;
 } {
@@ -137,13 +140,13 @@ function runCommand(raw: string): {
       };
     }
     case "goto": {
-      const route = PAGES[arg];
-      if (!route) {
+      const anchor = SECTION_IDS.find((id) => id === arg);
+      if (!anchor) {
         return {
-          output: `goto: ${arg || "<page>"}: not found (try: goto work | fun | about)`,
+          output: `goto: ${arg || "<section>"}: not found (try: goto ${SECTION_IDS.join(" | ")})`,
         };
       }
-      return { output: "", route, exit: true };
+      return { output: "", anchor, exit: true };
     }
     case "cat":
       if (arg === "awards") {
@@ -178,9 +181,10 @@ function runCommand(raw: string): {
 }
 
 export default function Terminal() {
-  const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [inE, setInE] = useState(false);
   const [lines, setLines] = useState<Line[]>([]);
+  const [bannerCount, setBannerCount] = useState(0);
   const [value, setValue] = useState("");
   const [history, setHistory] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
@@ -195,9 +199,16 @@ export default function Terminal() {
 
   const openTerminal = useCallback(() => {
     restoreFocusRef.current = document.activeElement as HTMLElement;
-    setLines([{ kind: "output", text: "snehanshn.com - type help to begin" }]);
+    setLines([]);
     setValue("");
     setHistoryIndex(-1);
+    // Reset the banner here (an event handler) so the typing effect below
+    // only ever sets state from its timers. Reduced motion: full line, now.
+    setBannerCount(
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ? BANNER.length
+        : 0,
+    );
     // Session-persisted history: reopening recalls previous commands.
     try {
       const saved = sessionStorage.getItem(HISTORY_KEY);
@@ -208,6 +219,14 @@ export default function Terminal() {
     setOpen(true);
   }, []);
 
+  // The `/` key answers only at rung E (the doorway buttons live in E's
+  // dress anyway, so this is the one global path that needs the gate).
+  useEffect(() => {
+    return subscribeJourneyProgress(({ activeRung }) => {
+      setInE(activeRung === "e");
+    });
+  }, []);
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement;
@@ -215,7 +234,7 @@ export default function Terminal() {
         target.tagName === "INPUT" ||
         target.tagName === "TEXTAREA" ||
         target.isContentEditable;
-      if (e.key === "/" && !open && !typing && !e.metaKey && !e.ctrlKey) {
+      if (e.key === "/" && !open && !typing && inE && !e.metaKey && !e.ctrlKey) {
         e.preventDefault();
         openTerminal();
       } else if (e.key === "Escape" && open) {
@@ -231,7 +250,31 @@ export default function Terminal() {
       window.removeEventListener("keydown", onKey);
       window.removeEventListener("terminal:open", onOpenEvent);
     };
-  }, [open, close, openTerminal]);
+  }, [open, inE, close, openTerminal]);
+
+  // The banner types itself in with punctuation-aware pacing (the study's
+  // typewriter rhythm): quick per char, a breath after a comma or dash, a
+  // longer one after a period. Instant under reduced motion (openTerminal
+  // seeds the full line and this effect stands down). It lives OUTSIDE
+  // the role="log" region so screen readers hear the sr-only copy once
+  // instead of one announcement per keystroke.
+  useEffect(() => {
+    if (!open) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let shown = 0;
+    let timer = 0;
+    const tick = () => {
+      shown += 1;
+      setBannerCount(shown);
+      if (shown >= BANNER.length) return;
+      const prev = BANNER[shown - 1];
+      const delay =
+        prev === "." ? 320 : prev === "," || prev === "-" ? 110 : 22;
+      timer = window.setTimeout(tick, delay);
+    };
+    timer = window.setTimeout(tick, 140);
+    return () => window.clearTimeout(timer);
+  }, [open]);
 
   useEffect(() => {
     if (open) inputRef.current?.focus();
@@ -268,11 +311,19 @@ export default function Terminal() {
     }
     setHistoryIndex(-1);
     setValue("");
-    if (result.route) {
-      // Don't restore focus to the pre-open element: it belongs to the
-      // page being left. Focus lands at the top of the new page.
+    if (result.anchor) {
+      // Don't restore focus to the pre-open element: the visitor asked to
+      // leave it. Focus lands on the section's heading (tabindex -1 in the
+      // dress) so keyboard and SR users arrive where the scroll does.
       close(false);
-      router.push(result.route);
+      const heading = document.getElementById(`${result.anchor}-title`);
+      const section = document.getElementById(result.anchor);
+      heading?.focus({ preventScroll: true });
+      (section ?? heading)?.scrollIntoView({
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+          ? "auto"
+          : "smooth",
+      });
       return;
     }
     if (result.exit) {
@@ -365,26 +416,36 @@ export default function Terminal() {
 
         <div
           ref={scrollRef}
-          role="log"
           className="flex-1 overflow-y-auto overscroll-contain px-4 py-3 font-mono text-[13px] leading-relaxed"
         >
-          {lines.map((line, i) =>
-            line.kind === "input" ? (
-              <p key={i} className="text-glow">
-                <span aria-hidden="true" className="text-flare">
-                  ❯{" "}
-                </span>
-                {line.text}
-              </p>
-            ) : (
-              <pre
-                key={i}
-                className="whitespace-pre-wrap break-words text-noise"
-              >
-                {line.text}
-              </pre>
-            )
-          )}
+          <p className="text-noise">
+            <span aria-hidden="true">
+              {BANNER.slice(0, bannerCount)}
+              {bannerCount < BANNER.length && (
+                <span className="text-flare">▌</span>
+              )}
+            </span>
+            <span className="sr-only">{BANNER}</span>
+          </p>
+          <div role="log">
+            {lines.map((line, i) =>
+              line.kind === "input" ? (
+                <p key={i} className="text-glow">
+                  <span aria-hidden="true" className="text-flare">
+                    ❯{" "}
+                  </span>
+                  {line.text}
+                </p>
+              ) : (
+                <pre
+                  key={i}
+                  className="whitespace-pre-wrap break-words text-noise"
+                >
+                  {line.text}
+                </pre>
+              )
+            )}
+          </div>
         </div>
 
         <div className="flex items-center gap-2 border-t border-trace/60 px-4 py-3">

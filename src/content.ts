@@ -34,10 +34,16 @@ export type Project = {
   link: { label: string; href: string };
   /**
    * Cover hue (CSS hue degrees) + motif for the designed abstract cover.
-   * TODO(snehanshn): real screenshot per card - replace the generated
-   * cover by adding a `coverSrc` under /public and wiring it in WorkCard.
+   * Used only by the dormant WorkCard/Cover salvage - rung E's showcase
+   * slots are blank plug-and-play panels, not motifs (rung-e-pristine.md).
    */
   cover: { hue: number; motif: CoverMotif };
+  /**
+   * Rung E showcase media slot - BLANK plug-and-play until real assets land.
+   * TODO(snehanshn): real screenshot/video per project - add { src, alt }
+   * (src under /public) and the showcase pane swaps it in, single-file edit.
+   */
+  media?: { src: string; alt: string };
 };
 
 export type Experience = {
@@ -69,13 +75,16 @@ export const identity = {
   },
   /** The latency joke the cursor tells over the hero name. */
   latencyJoke: "~2ms",
-  /** /fun statement - one notch more playful. */
+  /**
+   * Once /fun's statement; now rung E.4's lede (the trophy-shelf voice).
+   * Its emphasis word's glyphs live in the Fraunces italic subset.
+   */
   funStatement: {
     pre: "Weekends go to hackathons. The record is ",
     emphasis: "6-0",
     post: ".",
   },
-  /** /about statement. */
+  /** Once /about's statement; now rung E.1's lede. Emphasis subsetted. */
   aboutStatement: {
     pre: "I move data faster than markets ",
     emphasis: "blink",
@@ -406,19 +415,64 @@ export const journeyRungE = {
    * regenerating both - see "the site's edges" + the LCP contract.
    */
   statement: identity.statement,
+  /** Mono meta pair on E.0 - the LIFE act slides them in from alternating sides. */
+  heroKicker: identity.kicker,
+  /** The terminal's nav doorway at E, riding the hero's meta row. */
+  heroDoorway: "press /",
   /**
    * Section order is the persuasion arc (rung E ADR). `who-i-am` and
    * `hobbies` are 301 targets (/about, /fun) - never rename those ids.
+   * Ids double as the terminal's `goto` targets.
    */
   sections: [
-    { id: "who-i-am", kicker: "E.1", title: "Who I am" },
-    { id: "projects", kicker: "E.2", title: "Projects" },
-    { id: "experience", kicker: "E.3", title: "Experience" },
-    { id: "awards", kicker: "E.4", title: "Awards" },
-    { id: "hobbies", kicker: "E.5", title: "Hobbies" },
-    { id: "contact", kicker: "E.6", title: "Contact" },
+    { id: "who-i-am", kicker: "E.1 · the human", title: "Who I am" },
+    { id: "projects", kicker: "E.2 · the evidence", title: "Selected work" },
+    { id: "experience", kicker: "E.3 · the backbone", title: "Experience" },
+    { id: "awards", kicker: "E.4 · the shelf", title: "Awards" },
+    { id: "hobbies", kicker: "E.5 · off the clock", title: "Hobbies" },
+    { id: "contact", kicker: "E.6 · the ask", title: "Contact" },
   ],
-  /** Visible placeholder line inside each stub section until the rung E build. */
-  stubNote: "This section arrives with the rung E build.",
+  /** E.1 - words lead. The lede is the old /about statement (already subsetted). */
+  whoIAm: {
+    lede: identity.aboutStatement,
+    /** The portrait slot is plug-and-play; TODO(snehanshn): real photo. */
+    portraitPending: "portrait · pending",
+  },
+  /** E.2 - sticky showcase furniture. */
+  showcase: {
+    /** Mono whisper inside a blank media slot. */
+    mediaPending: "media · pending",
+  },
+  /** E.4 - big-type honor roll. The lede is the old /fun statement. */
+  honorRoll: {
+    lede: identity.funStatement,
+    /** Rides the scrubbed count-up: "8 wins and counting". */
+    counterLabel: "wins and counting",
+  },
+  /** E.5 - photo dump + currently strip. */
+  hobbies: {
+    currentlyLabel: "currently",
+    /** Mono whisper inside a blank photo-dump slot. */
+    photoPending: "photo · pending",
+  },
+  /**
+   * E.6 - the Coleman close. The ask bookends the hero: the site opens
+   * "systems that don't wait" and closes "Don't wait." - the emphasis word
+   * is already in the italic subset, so no font work.
+   * TODO(snehanshn): final voice pass on the close copy.
+   */
+  close: {
+    statement: {
+      pre: "You’ve seen the whole climb. Don’t ",
+      emphasis: "wait",
+      post: ".",
+    },
+    /** Mono whisper under the ask - a real command, not decoration. */
+    sub: "the terminal honors sudo hire-me",
+    /** Label for the enormous email CTA (renders only once contact.email is real). */
+    emailCta: "email me",
+  },
+  /** The binary whisper tape above the endcap encodes the latency joke. */
+  tape: identity.latencyJoke,
   rail: { less: "less hard sell", more: "more hard sell" } as RailLabels,
 } as const;
