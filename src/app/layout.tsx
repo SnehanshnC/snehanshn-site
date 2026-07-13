@@ -2,11 +2,7 @@ import type { Metadata } from "next";
 import { Fraunces, IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
 import localFont from "next/font/local";
 import { site } from "@/content";
-import Nav from "@/components/Nav";
-import Footer from "@/components/Footer";
-import Cursor from "@/components/Cursor";
 import ScrollRestorer from "@/components/ScrollRestorer";
-import Terminal from "@/components/Terminal";
 import "./globals.css";
 
 // The statement voice: variable Fraunces, optical axis only - the SOFT
@@ -49,16 +45,17 @@ const plexMono = IBM_Plex_Mono({
 // Unfurl contract: every route carries canonical + OpenGraph/Twitter tags
 // (a portfolio's first impression is usually a link card in iMessage/Slack/X).
 // The og:image is the static `opengraph-image.png` file convention beside
-// this file. Sub-pages override title/description/canonical/openGraph in
-// their own metadata exports - openGraph does NOT deep-merge, so each page
-// spells its object out in full.
+// this file. Any future page that overrides openGraph must spell the object
+// out in full (it does NOT deep-merge) including an explicit images entry.
+// ADR 0002 "SEO": metadata sells, the page jokes - title, description, and
+// the OG image stay straight max-sell with no bit.
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
-  title: site.title,
+  title: site.seoTitle,
   description: site.description,
   alternates: { canonical: "/" },
   openGraph: {
-    title: site.title,
+    title: site.seoTitle,
     description: site.description,
     url: "/",
     siteName: site.title,
@@ -77,12 +74,14 @@ export default function RootLayout({
       lang="en"
       className={`${fraunces.variable} ${frauncesItalic.variable} ${plexSans.variable} ${plexMono.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col">
-        <Nav />
-        <div className="flex-1">{children}</div>
-        <Footer />
-        <Terminal />
-        <Cursor />
+      {/*
+       * The journey frames itself (ADR 0001 - the quiet page's Nav/Footer
+       * chrome is retired; Cursor and Terminal return inside rung E as
+       * salvage, wired by the rung E task). ScrollRestorer stays: Next's
+       * async re-render still defeats native back/forward scroll restore.
+       */}
+      <body>
+        {children}
         <ScrollRestorer />
       </body>
     </html>
