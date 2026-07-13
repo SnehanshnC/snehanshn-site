@@ -17,6 +17,21 @@ All the personality lives where the visitor's hands are: a custom cursor that ta
 The site's market-desk history survives only as whispers: mono labels, tabular numbers, one amber thread, a tiny sparkline on /fun, and the terminal as the single dramatic dark moment.
 Never reintroduce background noise (canvases, tickers, particle fields).
 
+## TRANSITIONAL: the journey rebuild (ADRs win over this file)
+
+The site is being replaced by a single scroll journey (docs/adr/0001, 0002, and the five rung briefs; glossary in CONTEXT.md).
+Where those ADRs contradict this file - the organizing idea above, the page map, the motion rules - the ADRs win; this file gets rewritten once the journey's stages settle (a later phase's job).
+What is already true on `/`:
+
+- `app/page.tsx` renders `src/journey/Journey.tsx`: a sticky full-viewport stage re-dresses the pitch block through rungs A-D as native scroll advances, then unpins into rung E's document flow. Rung A ships real (the SSR default paint); B-E are stubs.
+- `/fun` and `/about` are gone: 301 -> `/#hobbies` and `/#who-i-am` in next.config.ts (statusCode 301 per ADR 0002, not Next's default 308). The sitemap is `/` only. `template.tsx` is gone (single route; its transform also breaks the rail's `position: fixed` while animating).
+- Rung contract: each rung lives entirely in `src/journey/rungs/<id>/` (meta.ts spans, dress.tsx visuals, seam.ts arrival beats) plus its `journeyRung<Id>` block in `src/content.ts`. Rung tasks never touch the stage, the rail, `track.ts`, or another rung. The full contract is in `src/journey/types.ts`.
+- Scroll geometry has one source of truth (`src/journey/track.ts`, built from the rung metas); `JourneyDriver.tsx` mounts each seam timeline as a child of ONE master scrubbed timeline (scrub 0.8) - independent per-seam scrubbed triggers clobber each other's clamped states on shared targets, so do not "simplify" back to them. No Lenis, no wheel re-interpretation, ever.
+- Reduced motion: the driver force-jumps each seam to progress 0/1 at its scroll midpoint - beats collapse to end states; seam builders must use explicit endpoints (`fromTo`/`set`, `immediateRender: false`).
+- The rail (`src/journey/Rail.tsx`) is a native range input: keyboard + slider semantics for free; per-rung re-dress happens from seam files via `SeamContext.rail`, label re-voicing via each content block's `rail` field.
+- `Nav`, `Footer`, `Terminal`, `Cursor` are unmounted salvage (rung E rewires them); their `/fun`, `/about` references are dormant, not live bugs.
+- E.0's statement is the document h1 and matches the OG image + Fraunces italic subset; changing it means regenerating both (see "The site's edges" + "Type" below).
+
 ## Page map
 
 | Route | File | What it is |

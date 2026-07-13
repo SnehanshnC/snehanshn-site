@@ -309,7 +309,116 @@ export const signOff = "Built by hand in New Jersey. Runs in milliseconds.";
 
 export const site = {
   title: "Snehanshn Chowdhury",
+  /**
+   * SEO title: metadata sells, the page jokes (ADR 0002). The document
+   * title/description carry the straight sell with no bit - a recruiter's
+   * first impression in Google/Slack must not be the joke without the
+   * punchline.
+   */
+  seoTitle: "Snehanshn Chowdhury · Real-Time Systems Engineer",
   description:
     "Snehanshn Chowdhury - real-time systems engineer. Solana trading infrastructure, agent orchestration, and things that move in milliseconds.",
   url: "https://snehanshn.com",
+} as const;
+
+/* ==========================================================================
+ * THE JOURNEY (docs/adr/0002-journey-architecture.md)
+ *
+ * One block per rung, clearly bounded: a rung task edits ONLY its own block
+ * (plus its own src/journey/rungs/<id>/ directory) - never another rung's.
+ * Copy voice per rung comes from that rung's ADR; every word stays here,
+ * typed, per the repo convention.
+ * ========================================================================== */
+
+/** Pole labels for the rail, re-voiced per rung (each rung ADR's "rail dress"). */
+export type RailLabels = { less: string; more: string };
+
+/** Journey copy owned by the shared scaffold (stage + rail), not by any rung. */
+export const journeyShared = {
+  /** Accessible name of the rail's landmark (ADR 0002: rail is primary navigation). */
+  railLandmarkLabel: "Journey",
+  /** Accessible name for the rail's slider. */
+  railAriaLabel: "Journey progress, from less hard sell to more hard sell",
+} as const;
+
+/* ---- RUNG A - RAW (docs/adr/rung-a-raw.md) ------------------------------ */
+export const journeyRungA = {
+  /**
+   * The five timid lines, top-left. All are paragraphs - the document h1
+   * belongs to rung E.0's statement (ADR 0002 "SEO" section).
+   * "[city]" is filled state-level ("new jersey", the repo's public
+   * location) - the privacy rule allows city-level AT MOST, never finer.
+   * The email line stays plain text: rung C's ADR fixes the functionality
+   * arc as "A inert", and contact.email is still `#todo` anyway.
+   */
+  // TODO(snehanshn): final copy polish (rung A ADR open item).
+  lines: [
+    "hi. i'm snehanshn.",
+    "i write code sometimes.",
+    "i live in new jersey.",
+    "email me if you want i guess",
+    "my projects (i'll add these later, sorry)",
+  ],
+  rail: { less: "less hard sell", more: "more hard sell" } as RailLabels,
+} as const;
+
+/* ---- RUNG B - KITSCH (docs/adr/rung-b-kitsch.md) ------------------------ */
+export const journeyRungB = {
+  /** Marquee headline; the decorative arrows are dress, not copy. */
+  headline: "WELCOME TO MY AWESOME SITE!!",
+  body: ["I build projects! I write code!", "And I live in new jersey!!"],
+  /** Decorative bevel buttons - press-effect only, no action (ADR: nothing works well on the bad pole). */
+  buttons: ["MY PROJECTS", "EMAIL ME!!"],
+  rail: { less: "LESS HARD SELL!!", more: "MORE HARD SELL!!" } as RailLabels,
+} as const;
+
+/* ---- RUNG C - AI-BLAND (docs/adr/rung-c-ai-bland.md) -------------------- */
+export const journeyRungC = {
+  hero: "🚀 Results-driven engineer shipping impactful solutions.",
+  /** The journey's first working interactions: mailto + smooth-scroll forward. */
+  ctas: { getInTouch: "Get in touch", learnMore: "Learn more" },
+  /** The three-emoji-card row - the signature template tell. */
+  cards: [
+    { emoji: "✨", title: "Clean code" },
+    { emoji: "💡", title: "Innovation" },
+    { emoji: "⚡", title: "Fast shipping" },
+  ],
+  rail: { less: "Less Hard Sell", more: "More Hard Sell ✨" } as RailLabels,
+} as const;
+
+/* ---- RUNG D - SAFE (docs/adr/rung-d-safe.md) ----------------------------- */
+export const journeyRungD = {
+  name: ["SNEHANSHN", "CHOWDHURY"],
+  role: ["Software engineer.", "Selected work below."],
+  /** Tiny mono meta labels on the Swiss grid. */
+  meta: { index: "·001", location: "New Jersey", year: "2026" },
+  rail: { less: "LESS HARD SELL", more: "MORE HARD SELL" } as RailLabels,
+} as const;
+
+/* ---- RUNG E - PRISTINE (docs/adr/rung-e-pristine.md) --------------------- */
+export const journeyRungE = {
+  /**
+   * E.0 - the document h1, server-rendered (ADR 0002 "SEO" section).
+   * TODO(snehanshn): the final max-sell statement is a rung E open item.
+   * Until then this reuses the proven statement so the OG image
+   * (rendered from it) and the Fraunces italic subset (holding its
+   * emphasis word's glyphs) both stay valid. Changing it means
+   * regenerating both - see "the site's edges" + the LCP contract.
+   */
+  statement: identity.statement,
+  /**
+   * Section order is the persuasion arc (rung E ADR). `who-i-am` and
+   * `hobbies` are 301 targets (/about, /fun) - never rename those ids.
+   */
+  sections: [
+    { id: "who-i-am", kicker: "E.1", title: "Who I am" },
+    { id: "projects", kicker: "E.2", title: "Projects" },
+    { id: "experience", kicker: "E.3", title: "Experience" },
+    { id: "awards", kicker: "E.4", title: "Awards" },
+    { id: "hobbies", kicker: "E.5", title: "Hobbies" },
+    { id: "contact", kicker: "E.6", title: "Contact" },
+  ],
+  /** Visible placeholder line inside each stub section until the rung E build. */
+  stubNote: "This section arrives with the rung E build.",
+  rail: { less: "less hard sell", more: "more hard sell" } as RailLabels,
 } as const;

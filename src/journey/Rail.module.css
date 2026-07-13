@@ -1,0 +1,41 @@
+/*
+ * The rail's structural styles plus its rung A dress (the SSR default):
+ * a bare, default-looking <input type="range"> with plain-text pole labels
+ * (rung-a-raw.md "dressed as a default range input"). Later rungs re-dress
+ * it from their arrival seams via SeamContext.rail - never by editing this
+ * file.
+ */
+
+.root {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 40;
+  /* Only the control itself takes the pointer - page content behind the
+     strip (e.g. rung E's close) stays clickable. */
+  pointer-events: none;
+  padding: 0 12px calc(2px + env(safe-area-inset-bottom));
+  /* Rung A voice: the same pinned Times the RAW dress uses. */
+  font-family: "Times New Roman", Times, serif;
+  font-size: 13px;
+}
+
+.labels {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.input {
+  display: block;
+  width: 100%;
+  /* Tap floor, authored in px on purpose: 44px is a physical-ergonomics
+     constant and must not inflate with the browser's text scale. The box
+     is the hit area; the UA-default track/thumb render centered inside. */
+  height: 44px;
+  margin: 0;
+  padding: 0;
+  pointer-events: auto;
+  /* UA-default appearance IS the rung A dress - style nothing else. */
+}

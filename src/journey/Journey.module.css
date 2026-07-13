@@ -1,0 +1,41 @@
+/*
+ * The stage's structural styles (ADR 0002 "Spatial structure"). Shared
+ * scaffold - rung tasks never edit this file; a rung styles only its own
+ * dress (and the rail via its seam).
+ */
+
+.track {
+  position: relative;
+  /* height set inline from track.ts (TRACK_VH) - the geometry source of truth */
+}
+
+/*
+ * The full-viewport pinned stage. 100vh, not svh/dvh: dvh resizes while
+ * browser chrome hides (jumpy mid-pin), and svh leaves a visible gap below
+ * the stage once chrome hides. With vh the worst case is the bottom sliver
+ * sitting below the fold while chrome shows - dresses keep critical content
+ * out of the bottom edge (the rail floats there anyway).
+ */
+.stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* One absolutely-stacked layer per stage rung (A-D). */
+.layer {
+  position: absolute;
+  inset: 0;
+}
+
+/*
+ * Pre-arrival default for every stage layer except rung A: hidden until its
+ * arrival seam shows it. This is also the no-JS truth: without timelines the
+ * page is rung A plus rung E's flowing content (ADR 0002 "SSR"). GSAP's
+ * autoAlpha drives the same two properties inline, overriding this cleanly.
+ */
+.layerHidden {
+  opacity: 0;
+  visibility: hidden;
+}
