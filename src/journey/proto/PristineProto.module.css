@@ -1,0 +1,341 @@
+/*
+ * TEMPORARY PROTOTYPE AREA - styles for the D->E detonation seam built
+ * twice (docs/adr/rung-e-pristine.md). Two identity classes compose on
+ * the root: .night (near-black void, warm text, --flare accents) and
+ * .paper (warm ivory pushed further, amber moments). Deleted once rung E
+ * adopts the winner.
+ *
+ * State contract (mirrors the journey's SSR pattern):
+ * - Base CSS authors the PRE-DETONATION scene (D visible, E hidden);
+ *   GSAP owns every in-between state at runtime.
+ * - The reduced-motion block (and the route's <noscript> twin) collapses
+ *   the track and shows the SETTLED scene statically - no scroll trap,
+ *   page reads complete.
+ */
+
+.root {
+  /* Identity tokens resolve here so both variants share one rule set. */
+  --proto-bg: var(--paper);
+  --proto-text: var(--ink);
+  --proto-dim: var(--faint);
+  --proto-hair: var(--line);
+  --proto-accent: var(--signal);
+}
+
+.night {
+  --proto-bg: var(--void);
+  --proto-text: var(--glow);
+  --proto-dim: var(--noise);
+  --proto-hair: var(--trace);
+  --proto-accent: var(--flare);
+}
+
+/* ---- scroll geometry ---------------------------------------------------- */
+
+.track {
+  position: relative;
+  height: 400vh; /* 100vh stage + 300vh seam span (dwell / 3 acts / settle) */
+}
+
+/* 100vh, not svh/dvh - same reasoning as the journey stage (Journey.module.css). */
+.stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.layer {
+  position: absolute;
+  inset: 0;
+}
+
+/* ---- layer 1: rung D replica, grayscale (the world before) --------------- */
+
+.dGray {
+  composes: layer;
+  background: #fafafa;
+  color: #111;
+}
+
+/* ---- layer 2: the same composition re-hued - act 1's flood --------------- */
+
+.dHued {
+  composes: layer;
+  background: var(--proto-bg);
+  color: var(--proto-text);
+  /* Flood origin over the name block; GSAP expands this to circle(150%). */
+  clip-path: circle(0% at 30% 34%);
+}
+
+/* Night desk: the terminal's grid whispers under the void - static, subtle. */
+.night .dHued::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(58, 74, 112, 0.14) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(58, 74, 112, 0.14) 1px, transparent 1px);
+  background-size: 56px 56px;
+  pointer-events: none;
+}
+
+/* The warm lamp at the flood's origin - painted once, never animated. */
+.floodGlow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    720px circle at 30% 34%,
+    rgba(242, 163, 60, 0.14),
+    transparent 70%
+  );
+}
+
+.paper .floodGlow {
+  background: radial-gradient(
+    780px circle at 30% 34%,
+    rgba(242, 163, 60, 0.16),
+    rgba(242, 163, 60, 0.05) 55%,
+    transparent 74%
+  );
+}
+
+/* ---- the D pitch block (rendered in both D layers) ------------------------ */
+
+.dPitch {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  padding: clamp(24px, 5vw, 72px);
+}
+
+.dRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+/* Inter-class per the rung D ADR; the neutral sans stands in until the
+   rung D task picks the real face - identity, not D fidelity, is judged here. */
+.dName {
+  font-weight: 600;
+  font-size: clamp(2.6rem, 7.5vw, 5.2rem);
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+}
+
+.dMeta {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #666;
+}
+
+.night .dHued .dMeta {
+  color: var(--noise);
+}
+
+.paper .dHued .dMeta {
+  color: var(--faint);
+}
+
+.dRole {
+  font-size: clamp(1rem, 1.6vw, 1.2rem);
+  line-height: 1.6;
+  color: #333;
+}
+
+.night .dHued .dRole {
+  color: var(--noise);
+}
+
+.paper .dHued .dRole {
+  color: var(--faint);
+}
+
+.night .dHued .dIndex,
+.paper .dHued .dIndex {
+  color: var(--proto-accent);
+}
+
+/* ---- layer 3: rung E's voice - acts 2 and 3 ------------------------------ */
+
+/* Content only; the flooded .dHued backdrop stays as the scene's ground. */
+.eVoice {
+  composes: layer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(24px, 6vw, 96px);
+  color: var(--proto-text);
+  opacity: 0;
+  visibility: hidden;
+}
+
+.eStatement {
+  max-width: 18ch;
+  font-size: clamp(2.5rem, 6.6vw, 5.1rem);
+  line-height: 1.08;
+  text-wrap: balance;
+}
+
+.word {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.char {
+  display: inline-block;
+  will-change: transform;
+}
+
+.em {
+  position: relative;
+  color: var(--proto-accent);
+}
+
+/* Settled night emphasis glows like the terminal prompt. */
+.night .em {
+  text-shadow: 0 0 28px rgba(242, 163, 60, 0.4);
+}
+
+/* Evolved paper: the emphasis word earns a flare marker swipe - ink on flare. */
+.paper .em {
+  color: var(--ink);
+}
+
+.paper .em .char {
+  position: relative;
+  z-index: 1;
+}
+
+.highlight {
+  position: absolute;
+  inset: 0.04em -0.1em -0.02em -0.08em;
+  background: var(--flare);
+  transform: scaleX(1); /* settled truth; GSAP rewinds it to 0 for the scrub */
+  transform-origin: left center;
+}
+
+.eRule {
+  width: min(200px, 32vw);
+  height: 2px;
+  margin-top: clamp(20px, 3vh, 36px);
+  background: var(--flare);
+  transform-origin: left center;
+}
+
+.eKicker {
+  margin-top: 16px;
+  font-family: var(--font-mono), monospace;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  color: var(--proto-dim);
+}
+
+/* The cursor pill wakes at the sentence's end - act 3's LIFE closer. */
+.pill {
+  display: inline-block;
+  margin-left: 0.35em;
+  padding: 0.32em 0.7em;
+  border-radius: 999px;
+  background: var(--flare);
+  color: var(--ink);
+  font-family: var(--font-mono), monospace;
+  font-size: clamp(11px, 0.9vw, 14px);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  vertical-align: middle;
+  transform: translateY(-0.3em);
+}
+
+/* ---- the ground below the unpinned stage --------------------------------- */
+
+.ground {
+  background: var(--proto-bg);
+  color: var(--proto-dim);
+  border-top: 1px solid var(--proto-hair);
+  padding: clamp(56px, 12vh, 120px) clamp(24px, 6vw, 96px);
+}
+
+.groundLine {
+  font-family: var(--font-mono), monospace;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  max-width: 52ch;
+}
+
+.groundNav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  margin-top: 24px;
+}
+
+.groundLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px; /* tap-target floor, px on purpose (repo verification rule) */
+  font-family: var(--font-mono), monospace;
+  font-size: 13px;
+  color: var(--proto-accent);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.night .groundLink {
+  color: var(--flare);
+}
+
+/* ---- the fixed variant badge (labels screenshots, links home) ------------ */
+
+.badge {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 50;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 16px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: var(--flare);
+}
+
+/* ---- reduced motion: static settled scene, no scroll trap ---------------- */
+/* The route's <noscript> style block mirrors these exact rules. */
+
+@media (prefers-reduced-motion: reduce) {
+  .track {
+    height: auto;
+  }
+
+  .stage {
+    position: static;
+    height: auto;
+    overflow: visible;
+  }
+
+  .dGray,
+  .dHued {
+    display: none;
+  }
+
+  .eVoice {
+    position: relative;
+    inset: auto;
+    min-height: 100svh;
+    opacity: 1;
+    visibility: visible;
+    background: var(--proto-bg);
+  }
+}
