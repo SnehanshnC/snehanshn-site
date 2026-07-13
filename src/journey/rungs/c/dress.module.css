@@ -1,0 +1,233 @@
+/*
+ * RUNG C - AI-BLAND dress (docs/adr/rung-c-ai-bland.md).
+ *
+ * Every rule here is the SETTLED template state - the no-JS and
+ * reduced-motion truth. The B->C seam (./seam.ts) supplies the chaos-era
+ * pre-states (magenta wash, lime comic shout, bevel skins, jitter
+ * transforms) as explicit GSAP fromTo/set values at runtime, so this
+ * stylesheet never has to know the seam exists.
+ *
+ * The palette is deliberately OFF the site's warm tokens: this rung is a
+ * costume - the universally recognizable purple->blue SaaS template - and
+ * borrowing --paper/--signal would dilute the parody.
+ */
+
+.root {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  background: linear-gradient(135deg, #7c3aed 0%, #2563eb 100%);
+  --c-font-sans:
+    Inter, "SF Pro Text", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  font-family: var(--c-font-sans);
+}
+
+/*
+ * The chaos underlay: rung B's magenta, painted by US so the seam can fade
+ * it without reaching into B's layer (the parallel-build contract treats
+ * the outgoing rung as an opaque root). Settled: gone.
+ */
+.chaosWash {
+  position: absolute;
+  inset: 0;
+  background: #e6009e;
+  opacity: 0;
+}
+
+.inner {
+  position: relative;
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+  /* Bottom clearance is the rail's strip (44px input + labels). */
+  padding: 32px 20px 96px;
+  text-align: center;
+}
+
+.hero {
+  display: grid;
+  justify-items: center;
+  gap: 18px;
+  max-width: 46rem;
+}
+
+/* The buzzword headline. Lower-level heading: the document h1 is E.0's. */
+.headline {
+  margin: 0;
+  font-family: var(--c-font-sans);
+  font-size: clamp(1.55rem, 1rem + 2.6vw, 2.6rem);
+  font-weight: 700;
+  line-height: 1.18;
+  letter-spacing: -0.01em;
+  color: #ffffff;
+  text-wrap: balance;
+}
+
+.subline {
+  margin: 0;
+  max-width: 34rem;
+  font-size: clamp(0.95rem, 0.85rem + 0.4vw, 1.1rem);
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.92);
+  text-wrap: balance;
+}
+
+.ctas {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+}
+
+/*
+ * Pill buttons. The button itself is a transparent shell; two absolutely
+ * stacked "skins" (bevel = chaos era, pill = template era) carry the look
+ * so the seam's bevel->pill beat is a pure opacity swap (compositor-only).
+ * 44px min-height in px on purpose - the tap floor is a physical constant.
+ */
+.button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 28px;
+  border: 0;
+  background: transparent;
+  font-family: var(--c-font-sans);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.buttonLabel {
+  position: relative;
+  z-index: 1;
+  color: #ffffff;
+}
+
+.skinBevel,
+.skinPill {
+  position: absolute;
+  inset: 0;
+}
+
+/* Chaos-era skin: silver bevel, the classic outset border. Settled: hidden. */
+.skinBevel {
+  opacity: 0;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #f5f5f5 0%, #c9c9c9 100%);
+  box-shadow:
+    inset -2px -2px 0 #8a8a8a,
+    inset 2px 2px 0 #ffffff;
+}
+
+/* Template-era skin: the rounded gradient pill with the soft shadow. */
+.skinPill {
+  opacity: 1;
+  border-radius: 999px;
+  box-shadow: 0 10px 26px rgba(30, 27, 75, 0.35);
+}
+
+.buttonPrimary .skinPill {
+  background: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+.buttonGhost .skinPill {
+  background: rgba(255, 255, 255, 0.14);
+  border: 1.5px solid rgba(255, 255, 255, 0.75);
+}
+
+/* The three-emoji-card row - the signature template tell. */
+.cards {
+  display: grid;
+  width: min(100%, 860px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  gap: 12px;
+}
+
+.card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 14px 34px rgba(23, 23, 50, 0.18);
+}
+
+.cardEmoji {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.cardTitle {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+/* Stacked cards go edge-soft, not full-bleed slabs. */
+@media (max-width: 719px) {
+  .cards {
+    max-width: 21rem;
+  }
+}
+
+/* Desktop: the sketch's three-across row, emoji above title. */
+@media (min-width: 720px) {
+  .cards {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+  }
+  .card {
+    flex-direction: column;
+    gap: 10px;
+    padding: 24px 18px;
+  }
+  .cardEmoji {
+    font-size: 28px;
+  }
+}
+
+/*
+ * Hover answers the visitor - transform-only, template-typical lift.
+ * The global amber focus ring is invisible on this gradient; the ring
+ * goes white here (never hidden - color only).
+ */
+.root a:focus-visible,
+.root button:focus-visible {
+  outline-color: #ffffff;
+}
+
+@media (hover: hover) {
+  .button {
+    transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .button:hover {
+    transform: translateY(-2px);
+  }
+  .card {
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .card:hover {
+    transform: translateY(-3px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button,
+  .card {
+    transition: none;
+  }
+}
