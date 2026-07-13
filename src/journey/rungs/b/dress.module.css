@@ -87,6 +87,17 @@
   animation-play-state: running;
 }
 
+/*
+ * Freeze gate: the B->C seam's FIRST beat flips data-b-frozen="1" (motion
+ * dies first - the loop halts at the seam's opening pixel, then gets
+ * smothered; rung C ADR beat 1). Three attributes outrank the two-attribute
+ * running rule above, so the freeze wins while both match; scrubbed back
+ * out, the seam restores "" and the loop resumes.
+ */
+[data-b-on="on"][data-b-live][data-b-frozen="1"] .strip {
+  animation-play-state: paused;
+}
+
 @keyframes b-marquee-slide {
   from {
     transform: translateX(0);

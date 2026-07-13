@@ -83,22 +83,37 @@ export const buildArrivalSeam: BuildArrivalSeam | null = ({
     0.4,
   );
 
-  // The rail's refined final form, snapped in as the flood peaks (its
-  // labels re-voice at the seam midpoint via activeRung, same moment).
-  // Inline snaps only - the native range keeps UA geometry; amber arrives
-  // through accent-color. Set beats revert cleanly on reverse scrub.
-  tl.set(
+  // The rail's refined final form (see ./rail-dress.css), snapped in as
+  // the flood peaks (its labels re-voice at the seam midpoint via
+  // activeRung, same moment). The rail dress protocol: flip the shared
+  // data-rail-dress attribute from D's value to ours - D's hairline rules
+  // stop matching, this rung's warm hairline + flare thumb take over, and
+  // the backward crossing restores "d" exactly. Micro-duration fromTo per
+  // rung B's engine finding (zero-duration attr tweens do not re-render
+  // their start on backward crossings). The label color rides inline,
+  // D's gray -> the paper's faint ink - the last link of the seams'
+  // label-color chain.
+  tl.fromTo(
     rail.root,
+    { attr: { "data-rail-dress": "d" } },
     {
-      fontFamily: "var(--font-plex-mono), monospace",
-      fontSize: "11px",
-      letterSpacing: "0.14em",
-      textTransform: "uppercase",
-      color: "var(--faint)",
+      attr: { "data-rail-dress": "e" },
+      duration: 0.01,
+      immediateRender: false,
     },
     0.5,
   );
-  tl.set(rail.input, { accentColor: "var(--signal)" }, 0.5);
+  tl.fromTo(
+    [rail.labelLess, rail.labelMore],
+    { color: "#666666" },
+    {
+      color: "#6d6558", // --faint (GSAP color tweens want concrete endpoints)
+      duration: 0.04,
+      ease: "none",
+      immediateRender: false,
+    },
+    0.5,
+  );
 
   // Pad to 1 so the cool-down maps onto the seam's whole scroll span.
   tl.to({}, { duration: 0 }, 1);

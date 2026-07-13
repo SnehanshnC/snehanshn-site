@@ -1,0 +1,65 @@
+/*
+ * RUNG E's rail dress - the refined final form (rung-e-pristine.md "Rail
+ * dress"): a warm 1px hairline track on the paper, a round amber thumb
+ * (the cursor dot's flare, riding the axis), faint mono uppercase labels.
+ * At journey's end the marker rests at "more hard sell".
+ *
+ * Global stylesheet (not a module: these rules target the shared rail's
+ * stable data-attribute hooks). Imported by ./dress.tsx.
+ *
+ * THE RAIL DRESS PROTOCOL (integration phase): keys on the ONE shared
+ * attribute [data-rail-dress="e"], flipped by the D->E seam (micro-
+ * duration attr fromTo, "d" -> "e" - see seam.ts). Rung D's hairline
+ * rules stop matching the moment the value changes; scrubbing back
+ * restores them exactly. Label COLOR is inline territory (the seams tween
+ * it, #666 -> --faint here); this sheet owns label typography only.
+ *
+ * The input keeps Rail.module.css's 44px box - that is the tap floor -
+ * and its focus outline: only track, thumb, and label typography change.
+ */
+
+[data-journey-rail][data-rail-dress="e"] {
+  font-family: var(--font-plex-mono), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+[data-journey-rail][data-rail-dress="e"] [data-journey-rail-input] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+}
+
+[data-journey-rail][data-rail-dress="e"]
+  [data-journey-rail-input]::-webkit-slider-runnable-track {
+  height: 1px;
+  background: var(--line);
+}
+
+[data-journey-rail][data-rail-dress="e"]
+  [data-journey-rail-input]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  margin-top: -5.5px; /* (1px track - 12px thumb) / 2 - centers on the hairline */
+  border: none;
+  border-radius: 999px; /* the round pole: refined, warm - the cursor dot's kin */
+  background: var(--flare);
+}
+
+[data-journey-rail][data-rail-dress="e"]
+  [data-journey-rail-input]::-moz-range-track {
+  height: 1px;
+  background: var(--line);
+}
+
+[data-journey-rail][data-rail-dress="e"]
+  [data-journey-rail-input]::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border: none;
+  border-radius: 999px;
+  background: var(--flare);
+}

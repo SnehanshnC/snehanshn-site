@@ -38,21 +38,19 @@ import type { BuildArrivalSeam } from "../../types";
  * force-jump to progress 0/1 renders pure B / pure C.
  */
 
-/** Chaos-era (rung-B-flavored) costume values - the explicit pre-states. */
+/**
+ * Chaos-era costume values - the explicit pre-states, matched EXACTLY to
+ * rung B's dress (b/dress.module.css, b/seam.ts) so the smother handoff
+ * never shifts hue or voice mid-crossfade.
+ */
 const CHAOS = {
-  lime: "#b4ff00",
-  font: '"Comic Sans MS", "Comic Sans", "Chalkboard SE", "Marker Felt", cursive',
-  buttonInk: "#16161d",
+  lime: "#aaff00",
+  font: '"Comic Sans MS", "Comic Sans", "Chalkboard SE", cursive',
+  buttonInk: "#cc0000",
 } as const;
 
 const TEMPLATE = {
   white: "#ffffff",
-  railAccent: "#7c3aed",
-  railWash:
-    "linear-gradient(90deg, rgba(124, 58, 237, 0.16), rgba(37, 99, 235, 0.16))",
-  railShadow: "0 6px 20px rgba(76, 29, 149, 0.25)",
-  railFont:
-    'Inter, "SF Pro Text", "Segoe UI", "Helvetica Neue", Arial, sans-serif',
 } as const;
 
 export const buildArrivalSeam: BuildArrivalSeam | null = ({
@@ -75,6 +73,23 @@ export const buildArrivalSeam: BuildArrivalSeam | null = ({
     to.querySelectorAll<HTMLElement>("[data-c-button-label]"),
   );
   const cards = Array.from(to.querySelectorAll<HTMLElement>("[data-c-card]"));
+
+  // "Marquee decelerates -> stops" (rung C ADR beat 1): the loop freezes at
+  // the seam's very first pixel of scroll - motion dies FIRST, before the
+  // smother even begins. A micro-duration attr fromTo (rung B's proven
+  // engine pattern - zero-duration attr sets do not re-render their start
+  // value on backward crossings), keyed on a dedicated freeze attribute so
+  // B's own data-b-on / data-b-live gates stay untouched; the pause rule
+  // lives beside them in b/dress.module.css. No-ops if the marquee is gone.
+  const marquee = from.querySelector<HTMLElement>("[data-b-marquee]");
+  if (marquee) {
+    tl.fromTo(
+      marquee,
+      { attr: { "data-b-frozen": "" } },
+      { attr: { "data-b-frozen": "1" }, duration: 0.01, immediateRender: false },
+      0,
+    );
+  }
 
   // Layer crossfade first - it works even if the dress internals ever
   // change shape (then bail to plain crossfade, never a broken journey).
@@ -152,19 +167,36 @@ export const buildArrivalSeam: BuildArrivalSeam | null = ({
     0.51,
   );
 
-  /* -- Rail re-dress: the gradient pill (rung C rail dress). ------------- */
-  tl.set(
-    rail.input,
+  /* -- Rail re-dress: the gradient pill (rung C rail dress). --------------
+     The rail dress protocol (see ./rail-dress.css): flip the shared
+     data-rail-dress attribute from B's value to ours - B's bevel rules
+     stop matching, this rung's pill rules take over, and the backward
+     crossing restores "b" exactly. Micro-duration fromTo, never a set():
+     zero-duration attr tweens do not re-render their start value when the
+     scrubbed master crosses them backward (rung B's engine finding).
+     The label COLOR rides inline, B's lime -> template white - explicit
+     endpoints that chain with the neighboring seams' label tweens. */
+  tl.fromTo(
+    rail.root,
+    { attr: { "data-rail-dress": "b" } },
     {
-      accentColor: TEMPLATE.railAccent,
-      borderRadius: 999,
-      background: TEMPLATE.railWash,
-      boxShadow: TEMPLATE.railShadow,
+      attr: { "data-rail-dress": "c" },
+      duration: 0.01,
       immediateRender: false,
     },
     0.5,
   );
-  tl.set(rail.root, { fontFamily: TEMPLATE.railFont, immediateRender: false }, 0.5);
+  tl.fromTo(
+    [rail.labelLess, rail.labelMore],
+    { color: "#aaff00" },
+    {
+      color: TEMPLATE.white,
+      duration: 0.06,
+      ease: "none",
+      immediateRender: false,
+    },
+    0.5,
+  );
 
   /* -- Beat 4: bevels -> rounded gradient pills, staggered per button. --- */
   bevelSkins.forEach((skin, i) => {

@@ -36,7 +36,25 @@ export type RungMeta = {
   arrivalSeamVh: number;
 };
 
-/** The rail's live elements, exposed to seams for per-rung rail re-dress beats. */
+/**
+ * The rail's live elements, exposed to seams for per-rung rail re-dress
+ * beats.
+ *
+ * THE RAIL DRESS PROTOCOL (all four re-dressing rungs follow it):
+ *   - Chrome (track/thumb/label typography) lives in a per-rung global
+ *     stylesheet (rungs/<id>/rail-dress.css, imported by that dress),
+ *     keyed on the ONE shared attribute [data-rail-dress="<id>"] on
+ *     `root`. The arrival seam flips the attribute from the previous
+ *     rung's value with a micro-duration attr fromTo (never a set(), and
+ *     never zero duration - zero-duration attr tweens do not re-render
+ *     their start value on backward crossings). One attribute means one
+ *     owner per scroll position: no resets, no specificity wars.
+ *   - Label COLOR is the exception: seams tween it inline as part of
+ *     their choreography, each fromTo starting exactly where the previous
+ *     seam's ended (ink -> lime -> white -> #666 -> faint).
+ *   - The input's 44px box (the tap floor) and focus outline are never
+ *     touched by any dress.
+ */
 export type RailElements = {
   /** The fixed bottom-edge wrapper. */
   root: HTMLElement;

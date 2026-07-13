@@ -24,13 +24,14 @@
 
 /*
  * The chaos underlay: rung B's magenta, painted by US so the seam can fade
- * it without reaching into B's layer (the parallel-build contract treats
- * the outgoing rung as an opaque root). Settled: gone.
+ * it without reaching into B's layer (originally a parallel-build seam;
+ * the color is B's EXACT #ff00cc so the smother handoff never shifts hue).
+ * Settled: gone.
  */
 .chaosWash {
   position: absolute;
   inset: 0;
-  background: #e6009e;
+  background: #ff00cc;
   opacity: 0;
 }
 
@@ -120,11 +121,13 @@
 /* Chaos-era skin: silver bevel, the classic outset border. Settled: hidden. */
 .skinBevel {
   opacity: 0;
-  border-radius: 4px;
-  background: linear-gradient(180deg, #f5f5f5 0%, #c9c9c9 100%);
+  border-radius: 3px;
+  /* Rung B's exact bevel recipe (b/dress.module.css .button) - the chaos
+     costume must be indistinguishable from the real thing mid-smother. */
+  background: linear-gradient(180deg, #fdfdfd 0%, #d2d2d2 55%, #b0b0b0 100%);
   box-shadow:
-    inset -2px -2px 0 #8a8a8a,
-    inset 2px 2px 0 #ffffff;
+    inset -3px -3px 0 #8a8a8a,
+    inset 3px 3px 0 #ffffff;
 }
 
 /* Template-era skin: the rounded gradient pill with the soft shadow. */
