@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 
 /*
- * TEMPORARY PROTOTYPE ROUTE - the D->E detonation seam identity prototype
- * (docs/adr/rung-e-pristine.md). Not in sitemap.ts, noindexed here for the
- * whole segment; deleted once rung E adopts the winning identity.
+ * TEMPORARY PROTOTYPE ROUTE - the D->E detonation seam in the winning
+ * evolved-paper identity (docs/adr/rung-e-pristine.md). Not in sitemap.ts,
+ * noindexed for the whole segment.
+ *
+ * TODO(rung-e): adopt into src/journey/rungs/e/ and remove this route.
  */
 export const metadata: Metadata = {
   title: "pristine proto (temporary)",

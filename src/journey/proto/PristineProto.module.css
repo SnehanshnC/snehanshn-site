@@ -1,9 +1,10 @@
 /*
- * TEMPORARY PROTOTYPE AREA - styles for the D->E detonation seam built
- * twice (docs/adr/rung-e-pristine.md). Two identity classes compose on
- * the root: .night (near-black void, warm text, --flare accents) and
- * .paper (warm ivory pushed further, amber moments). Deleted once rung E
- * adopts the winner.
+ * TEMPORARY PROTOTYPE AREA - styles for the D->E detonation seam in the
+ * winning evolved-paper identity (docs/adr/rung-e-pristine.md "Decided:
+ * identity = EVOLVED PAPER"): warm ivory, ink, amber moments, editorial
+ * serif - the current identity pushed further with real motion.
+ *
+ * TODO(rung-e): adopt into src/journey/rungs/e/ and remove this route.
  *
  * State contract (mirrors the journey's SSR pattern):
  * - Base CSS authors the PRE-DETONATION scene (D visible, E hidden);
@@ -14,20 +15,11 @@
  */
 
 .root {
-  /* Identity tokens resolve here so both variants share one rule set. */
   --proto-bg: var(--paper);
   --proto-text: var(--ink);
   --proto-dim: var(--faint);
   --proto-hair: var(--line);
   --proto-accent: var(--signal);
-}
-
-.night {
-  --proto-bg: var(--void);
-  --proto-text: var(--glow);
-  --proto-dim: var(--noise);
-  --proto-hair: var(--trace);
-  --proto-accent: var(--flare);
 }
 
 /* ---- scroll geometry ---------------------------------------------------- */
@@ -68,18 +60,6 @@
   clip-path: circle(0% at 30% 34%);
 }
 
-/* Night desk: the terminal's grid whispers under the void - static, subtle. */
-.night .dHued::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(58, 74, 112, 0.14) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(58, 74, 112, 0.14) 1px, transparent 1px);
-  background-size: 56px 56px;
-  pointer-events: none;
-}
-
 /*
  * The re-hued copy must occupy the exact same box as the gray layer's
  * pitch (act 1 is COLOR only - rows may not shift). Without this the
@@ -95,14 +75,6 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: radial-gradient(
-    720px circle at 30% 34%,
-    rgba(242, 163, 60, 0.14),
-    transparent 70%
-  );
-}
-
-.paper .floodGlow {
   background: radial-gradient(
     780px circle at 30% 34%,
     rgba(242, 163, 60, 0.16),
@@ -148,31 +120,19 @@
   color: #666;
 }
 
-.night .dHued .dMeta {
-  color: var(--noise);
+.dHued .dMeta,
+.dHued .dRole {
+  color: var(--faint);
 }
 
-.paper .dHued .dMeta {
-  color: var(--faint);
+.dHued .dIndex {
+  color: var(--proto-accent);
 }
 
 .dRole {
   font-size: clamp(1rem, 1.6vw, 1.2rem);
   line-height: 1.6;
   color: #333;
-}
-
-.night .dHued .dRole {
-  color: var(--noise);
-}
-
-.paper .dHued .dRole {
-  color: var(--faint);
-}
-
-.night .dHued .dIndex,
-.paper .dHued .dIndex {
-  color: var(--proto-accent);
 }
 
 /* ---- layer 3: rung E's voice - acts 2 and 3 ------------------------------ */
@@ -206,22 +166,13 @@
   will-change: transform;
 }
 
+/* Evolved paper: the emphasis word earns a flare marker swipe - ink on flare. */
 .em {
   position: relative;
-  color: var(--proto-accent);
-}
-
-/* Settled night emphasis glows like the terminal prompt. */
-.night .em {
-  text-shadow: 0 0 28px rgba(242, 163, 60, 0.4);
-}
-
-/* Evolved paper: the emphasis word earns a flare marker swipe - ink on flare. */
-.paper .em {
   color: var(--ink);
 }
 
-.paper .em .char {
+.em .char {
   position: relative;
   z-index: 1;
 }
@@ -282,29 +233,7 @@
   max-width: 52ch;
 }
 
-.groundNav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 24px;
-  margin-top: 24px;
-}
-
-.groundLink {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px; /* tap-target floor, px on purpose (repo verification rule) */
-  font-family: var(--font-mono), monospace;
-  font-size: 13px;
-  color: var(--proto-accent);
-  text-decoration: underline;
-  text-underline-offset: 4px;
-}
-
-.night .groundLink {
-  color: var(--flare);
-}
-
-/* ---- the fixed variant badge (labels screenshots, links home) ------------ */
+/* ---- the fixed proto badge (labels screenshots) --------------------------- */
 
 .badge {
   position: fixed;

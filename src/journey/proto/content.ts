@@ -1,13 +1,14 @@
 /*
- * TEMPORARY PROTOTYPE AREA - the D->E detonation seam identity prototype
- * (docs/adr/rung-e-pristine.md "Decided: identity chosen by prototype").
+ * TEMPORARY PROTOTYPE AREA - the D->E detonation seam in the WINNING
+ * evolved-paper identity (docs/adr/rung-e-pristine.md "Decided: identity
+ * = EVOLVED PAPER"). The night-desk candidate was built, compared on
+ * PR #15, and removed per the captain's pick.
+ *
+ * TODO(rung-e): adopt into src/journey/rungs/e/ and remove this route.
  *
  * This file is the prototype's OWN copy of the pitch-block content: the
  * rung contract forbids a prototype from leaning on the journeyRungD /
  * journeyRungE blocks in src/content.ts (those belong to the live rungs).
- * The words deliberately mirror them so the captain compares identities,
- * not copy. Everything under src/journey/proto/ plus the /proto-pristine
- * route is deleted once rung E's real task adopts the winning identity.
  */
 
 /** Rung D's professional voice - the pre-detonation scene. */
@@ -33,12 +34,8 @@ export const protoE = {
   pill: "~2ms",
 } as const;
 
-export type ProtoVariant = "night" | "paper";
-
-export const variantLabels: Record<ProtoVariant, string> = {
-  night: "night-desk",
-  paper: "evolved paper",
-};
+/** The fixed corner badge labeling the prototype. */
+export const protoBadge = "proto · evolved paper · D→E seam";
 
 /** The ground strip below the unpinned stage. */
 export const protoGround = {

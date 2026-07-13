@@ -1,38 +1,42 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import Link from "next/link";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import {
-  protoD,
-  protoE,
-  protoGround,
-  variantLabels,
-  type ProtoVariant,
-} from "./content";
+import { protoBadge, protoD, protoE, protoGround } from "./content";
 import styles from "./PristineProto.module.css";
 
 /*
- * TEMPORARY PROTOTYPE AREA - the D->E detonation seam, built twice so the
- * captain picks rung E's identity (docs/adr/rung-e-pristine.md).
+ * TEMPORARY PROTOTYPE AREA - the D->E detonation seam in the WINNING
+ * evolved-paper identity (docs/adr/rung-e-pristine.md "Decided: identity
+ * = EVOLVED PAPER"; the night-desk candidate was compared on PR #15 and
+ * removed per the captain's pick).
  *
- * One self-contained scroll scene per variant: a sticky stage shows a
- * rung D replica, then the three-act detonation plays as ONE scrubbed
- * GSAP timeline (scrub 0.8, native scroll only - ADR 0002 physics):
+ * TODO(rung-e): adopt into src/journey/rungs/e/ and remove this route.
  *
- *   Act 1 - COLOR: the identity floods from a point via clip-path circle;
+ * One self-contained scroll scene: a sticky stage shows a rung D
+ * replica, then the three-act detonation plays as ONE scrubbed GSAP
+ * timeline (scrub 0.8, native scroll only - ADR 0002 physics):
+ *
+ *   Act 1 - COLOR: warm paper floods from a point via clip-path circle;
  *           grayscale dies.
  *   Act 2 - VOICE: the professional sans copy fades; the editorial serif
  *           statement snaps in, unsettled.
- *   Act 3 - LIFE: chars settle with stagger, the emphasis ignites, the
- *           amber rule draws, the kicker eases in, the cursor pill wakes.
+ *   Act 3 - LIFE: chars settle with stagger, the emphasis word earns its
+ *           flare marker swipe, the amber rule draws, the kicker eases
+ *           in, the cursor pill wakes.
  *
  * Then the stage unpins into a short ground strip (where rung E's real
  * portfolio would begin - deliberately NOT built here).
  *
+ * The adopting task should note the ADR's decided mechanics upgrade two
+ * of these beats: Act 1 becomes a transform-scaled pre-painted bloom
+ * with power4.in (this prototype's clip-path flood is the sketch, not
+ * the law), and Act 3 becomes the full LIFE entrance grammar (clipped
+ * char rise, amber thread draw-in, labels from alternating sides).
+ *
  * This file never touches the journey's stage/rail/driver/track or any
- * rung directory. Deleted once rung E adopts the winning identity.
+ * rung directory.
  */
 
 /**
@@ -44,7 +48,7 @@ const BEAT = {
   copyOut: { at: 0.47, dur: 0.09 }, // act 2 - VOICE (professional fades)
   voiceIn: { at: 0.52, dur: 0.07 }, // act 2 - VOICE (serif snaps in)
   settle: { at: 0.6, dur: 0.12, each: 0.003 }, // act 3 - LIFE (chars)
-  ignite: { at: 0.68, dur: 0.08 }, // act 3 - LIFE (emphasis)
+  ignite: { at: 0.68, dur: 0.08 }, // act 3 - LIFE (the marker swipe)
   rule: { at: 0.72, dur: 0.09 }, // act 3 - LIFE (the amber thread)
   kicker: { at: 0.76, dur: 0.09 }, // act 3 - LIFE (details ease in)
   pill: { at: 0.82, dur: 0.05 }, // act 3 - LIFE (the cursor wakes)
@@ -106,7 +110,7 @@ function DPitch() {
   );
 }
 
-export default function PristineProto({ variant }: { variant: ProtoVariant }) {
+export default function PristineProto() {
   const rootRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -115,7 +119,6 @@ export default function PristineProto({ variant }: { variant: ProtoVariant }) {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     gsap.registerPlugin(ScrollTrigger);
-    const isNight = variant === "night";
 
     const ctx = gsap.context((self) => {
       const q = self.selector;
@@ -129,19 +132,10 @@ export default function PristineProto({ variant }: { variant: ProtoVariant }) {
         yPercent: 28,
         rotate: (i: number) => (i % 2 ? 2.2 : -2.2),
       });
+      gsap.set(q("[data-proto-highlight]"), { scaleX: 0 });
       gsap.set(q("[data-proto-rule]"), { scaleX: 0 });
       gsap.set(q("[data-proto-kicker]"), { autoAlpha: 0, y: 14 });
       gsap.set(q("[data-proto-pill]"), { autoAlpha: 0, scale: 0.4 });
-      if (isNight) {
-        // Ignite tweens the em from body-glow to flare (tokens are fixed
-        // hexes - GSAP interpolates literals, not var() strings).
-        gsap.set(q("[data-proto-em]"), {
-          color: "#e8ecf4",
-          textShadow: "0 0 0 rgba(242,163,60,0)",
-        });
-      } else {
-        gsap.set(q("[data-proto-highlight]"), { scaleX: 0 });
-      }
 
       const tl = gsap.timeline({ defaults: { ease: "none" }, paused: true });
 
@@ -182,23 +176,11 @@ export default function PristineProto({ variant }: { variant: ProtoVariant }) {
         },
         BEAT.settle.at,
       );
-      if (isNight) {
-        tl.to(
-          q("[data-proto-em]"),
-          {
-            color: "#f2a33c",
-            textShadow: "0 0 28px rgba(242,163,60,0.4)",
-            duration: BEAT.ignite.dur,
-          },
-          BEAT.ignite.at,
-        );
-      } else {
-        tl.to(
-          q("[data-proto-highlight]"),
-          { scaleX: 1, duration: BEAT.ignite.dur },
-          BEAT.ignite.at,
-        );
-      }
+      tl.to(
+        q("[data-proto-highlight]"),
+        { scaleX: 1, duration: BEAT.ignite.dur },
+        BEAT.ignite.at,
+      );
       tl.to(
         q("[data-proto-rule]"),
         { scaleX: 1, duration: BEAT.rule.dur },
@@ -233,20 +215,13 @@ export default function PristineProto({ variant }: { variant: ProtoVariant }) {
     }, rootRef);
 
     return () => ctx.revert();
-  }, [variant]);
+  }, []);
 
   const s = protoE.statement;
-  const other: ProtoVariant = variant === "night" ? "paper" : "night";
 
   return (
-    <div
-      ref={rootRef}
-      className={`${styles.root} ${styles[variant]}`}
-      data-proto-variant={variant}
-    >
-      <Link href="/proto-pristine" className={styles.badge}>
-        proto · {variantLabels[variant]} · D→E seam
-      </Link>
+    <div ref={rootRef} className={styles.root} data-proto-root>
+      <span className={styles.badge}>{protoBadge}</span>
 
       <div className={styles.track} data-proto-track>
         <div className={styles.stage}>
@@ -266,13 +241,8 @@ export default function PristineProto({ variant }: { variant: ProtoVariant }) {
               <span aria-hidden>
                 <SplitWords text={s.pre} />
                 <span className={styles.word}>
-                  <em className={styles.em} data-proto-em>
-                    {variant === "paper" && (
-                      <span
-                        className={styles.highlight}
-                        data-proto-highlight
-                      />
-                    )}
+                  <em className={styles.em}>
+                    <span className={styles.highlight} data-proto-highlight />
                     <Chars word={s.emphasis} />
                   </em>
                   <Chars word={s.post} />
@@ -297,14 +267,6 @@ export default function PristineProto({ variant }: { variant: ProtoVariant }) {
 
       <section className={styles.ground}>
         <p className={styles.groundLine}>{protoGround.line}</p>
-        <nav className={styles.groundNav} aria-label="Prototype navigation">
-          <Link href={`/proto-pristine/${other}`} className={styles.groundLink}>
-            view the {variantLabels[other]} variant
-          </Link>
-          <Link href="/proto-pristine" className={styles.groundLink}>
-            back to the prototype index
-          </Link>
-        </nav>
       </section>
 
       {/*
@@ -316,9 +278,7 @@ export default function PristineProto({ variant }: { variant: ProtoVariant }) {
           [data-proto-track] { height: auto !important; }
           [data-proto-track] > div { position: static !important; height: auto !important; overflow: visible !important; }
           [data-proto-d-gray], [data-proto-hued] { display: none !important; }
-          [data-proto-e] { position: relative !important; inset: auto !important; min-height: 100svh; opacity: 1 !important; visibility: visible !important; }
-          [data-proto-variant="night"] [data-proto-e] { background: var(--void); }
-          [data-proto-variant="paper"] [data-proto-e] { background: var(--paper); }
+          [data-proto-e] { position: relative !important; inset: auto !important; min-height: 100svh; opacity: 1 !important; visibility: visible !important; background: var(--paper); }
         `}</style>
       </noscript>
     </div>
