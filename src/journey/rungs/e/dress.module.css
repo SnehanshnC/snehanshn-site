@@ -1,0 +1,1022 @@
+/*
+ * RUNG E - PRISTINE (docs/adr/rung-e-pristine.md).
+ *
+ * State contract (the journey's SSR pattern): this base CSS is the
+ * SETTLED truth - every element reads complete and static with no JS and
+ * under prefers-reduced-motion. Motion.tsx rewinds elements to their
+ * pre-arrival states at runtime (fromTo, immediateRender: false) and
+ * scrubs them in; nothing here may depend on JS to become visible.
+ *
+ * Engineering doctrine (rung E ADR, binding): JS writes numbers (--p,
+ * --lift per showcase card), CSS owns geometry via calc()-composed
+ * transforms; content-visibility only on the decorative media panes
+ * (hiding the words from AT would break "pitch reachable non-visually");
+ * no filters, no animated clip-path - the detonation bloom is pre-painted
+ * and transform-scaled.
+ */
+
+.root {
+  --e-pad: clamp(20px, 5vw, 96px);
+  background: var(--paper);
+  /* Tilted dump prints and mid-flight cards must never widen the page. */
+  overflow-x: clip;
+}
+
+.shell {
+  max-width: 1400px;
+  margin-inline: auto;
+  padding-inline: var(--e-pad);
+}
+
+/* ---- the detonation's fixed layers (scrubbed by seam.ts) ----------------- */
+
+/*
+ * Act 1's bloom: a pre-painted paper disc with an amber wavefront riding
+ * its rim, centered on rung D's name block (30% 34% - the proto's origin,
+ * kept). Painted once at rest scale 1; the seam transform-scales it from
+ * 0.004, so the zoom is pure compositor work - no clip-path animation,
+ * no filters (decided mechanic 2).
+ */
+.bloom {
+  position: fixed;
+  z-index: 10;
+  width: 300vmax;
+  height: 300vmax;
+  left: calc(30vw - 150vmax);
+  top: calc(34vh - 150vmax);
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  will-change: transform;
+  background:
+    radial-gradient(
+      closest-side,
+      rgba(242, 163, 60, 0) 0%,
+      rgba(242, 163, 60, 0) 54%,
+      rgba(242, 163, 60, 0.32) 63%,
+      rgba(242, 163, 60, 0.1) 69%,
+      rgba(242, 163, 60, 0) 74%
+    ),
+    radial-gradient(
+      closest-side,
+      var(--paper) 0%,
+      var(--paper) 66%,
+      rgba(250, 248, 243, 0) 77%
+    );
+}
+
+/* The warm lamp pooling at the detonation point; cools with the bloom. */
+.glow {
+  position: fixed;
+  z-index: 11;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  background: radial-gradient(
+    820px circle at 30% 34%,
+    rgba(242, 163, 60, 0.18),
+    rgba(242, 163, 60, 0.12) 32%,
+    rgba(242, 163, 60, 0.06) 55%,
+    rgba(242, 163, 60, 0.02) 68%,
+    transparent 80%
+  );
+}
+
+/* ---- E.0 - the statement hero -------------------------------------------- */
+
+.hero {
+  min-height: 100svh;
+  display: grid;
+  align-content: center;
+  padding-block: clamp(72px, 10vh, 128px) clamp(96px, 14vh, 160px);
+}
+
+.heroStatement {
+  max-width: 20ch;
+  font-size: clamp(2.5rem, 6.6vw, 5.2rem);
+  line-height: 1.08;
+  text-wrap: balance;
+}
+
+/*
+ * The VOICE act's typesetting machinery. Each word is a vertical clip
+ * window (negative insets leave room for ascenders, descenders and the
+ * italic's overhang); chars inside are two complementary half-glyph
+ * slices that Motion.tsx drops/raises into place from ±135%.
+ */
+.word {
+  display: inline-block;
+  white-space: nowrap;
+  clip-path: inset(-0.18em -0.08em -0.12em -0.08em);
+}
+
+.char {
+  position: relative;
+  display: inline-block;
+}
+
+/* Bottom half-glyph: in flow, sizes the char box. */
+.sliceB {
+  display: inline-block;
+  clip-path: inset(46% -0.1em -0.2em -0.1em);
+}
+
+/* Top half-glyph: stacked over the same box. 8% overlap - no seam. */
+.sliceA {
+  position: absolute;
+  inset: 0;
+  clip-path: inset(-0.2em -0.1em 46% -0.1em);
+}
+
+.emWord {
+  composes: word;
+}
+
+/* The emphasis word: ink on a flare marker swipe (the proto's beat). */
+.em {
+  position: relative;
+  display: inline-block;
+  color: var(--ink);
+}
+
+.highlight {
+  position: absolute;
+  inset: 0.04em -0.12em -0.02em -0.1em;
+  background: var(--flare);
+  transform-origin: left center;
+  /* Settled truth scaleX(1); Motion rewinds it to 0 for the swipe. */
+}
+
+/*
+ * Split-flap boxes for the emphasis word (menu item 5): two stacked
+ * copies of the same glyph in a clipped window; the idle roll translates
+ * the stack -50% then resets invisibly. Horizontal padding + negative
+ * margin widen the clip window for the italic's overhang without
+ * touching line layout. Window height fits descender-free words - which
+ * all emphasis words are (they live in the italic subset).
+ */
+.flapChar {
+  position: relative;
+  z-index: 1;
+  display: inline-block;
+  /* clip-path, not overflow: it clips the roll without moving the
+     inline-block baseline or growing the line box. */
+  clip-path: inset(-0.12em -0.08em -0.08em -0.08em);
+}
+
+.flapStack {
+  display: block;
+  position: relative;
+}
+
+.flapCopy {
+  display: block;
+}
+
+/* The understudy glyph waits one line below, out of flow so the char
+   box stays one line tall; the roll slides it into the window. */
+.flapCopy + .flapCopy {
+  position: absolute;
+  top: 100%;
+  left: 0;
+}
+
+.flapRolling {
+  animation: flap-roll 0.9s cubic-bezier(0.83, 0, 0.17, 1) both;
+}
+
+@keyframes flap-roll {
+  to {
+    transform: translateY(-100%);
+  }
+}
+
+/* Keep the post-punctuation chars above the marker too. */
+.emWord .char {
+  position: relative;
+  z-index: 1;
+}
+
+/* The amber thread that draws itself under the statement (LIFE act). */
+.thread {
+  width: min(240px, 36vw);
+  height: 2px;
+  margin-top: clamp(24px, 3.5vh, 40px);
+  background: var(--flare);
+  transform-origin: left center;
+}
+
+.heroMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-top: clamp(20px, 3vh, 32px);
+}
+
+.heroKicker {
+  font-family: var(--font-plex-mono), monospace;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  color: var(--faint);
+}
+
+.heroDoor {
+  display: inline-flex;
+}
+
+/* ---- shared section furniture -------------------------------------------- */
+
+.section {
+  padding-block: clamp(88px, 13vh, 160px) 0;
+}
+
+.sectionHead {
+  display: block;
+}
+
+/* The arrival hairline: two halves growing from the edges inward. */
+.rule {
+  display: flex;
+  height: 1px;
+}
+
+.ruleHalfL,
+.ruleHalfR {
+  flex: 1;
+  background: var(--line);
+}
+
+.ruleHalfL {
+  transform-origin: left center;
+}
+
+.ruleHalfR {
+  transform-origin: right center;
+}
+
+.kicker {
+  margin-top: 28px;
+  font-family: var(--font-plex-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.sectionTitle {
+  margin-top: 10px;
+  font-size: clamp(1.5rem, 2.4vw, 2rem);
+  font-weight: 500;
+}
+
+.lede {
+  margin-top: clamp(32px, 5vh, 56px);
+  max-width: 26ch;
+  font-size: clamp(1.9rem, 4vw, 3.2rem);
+  line-height: 1.16;
+  text-wrap: balance;
+}
+
+.body {
+  max-width: 58ch;
+  font-size: 17px;
+  line-height: 1.65;
+}
+
+.mono {
+  font-family: var(--font-plex-mono), monospace;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  color: var(--faint);
+}
+
+/* ---- E.1 - who i am ------------------------------------------------------- */
+
+.whoGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: clamp(32px, 6vw, 96px);
+  align-items: start;
+  margin-top: clamp(40px, 6vh, 64px);
+}
+
+.whoWords {
+  display: grid;
+  gap: 20px;
+}
+
+/* The modest frame: a print matted on paper, words carry the section. */
+.portrait {
+  justify-self: end;
+  width: min(100%, 300px);
+  border: 1px solid var(--line);
+  background: var(--paper);
+  padding: 10px;
+  box-shadow: 0 14px 32px -18px rgba(33, 29, 22, 0.25);
+}
+
+.portraitBlank {
+  aspect-ratio: 4 / 5;
+  background: var(--wash);
+  display: grid;
+  place-items: center;
+}
+
+.pendingNote {
+  font-family: var(--font-plex-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+/* ---- E.2 - the SlowMo hang-time showcase ---------------------------------- */
+
+.showcaseTrack {
+  position: relative;
+  height: 660vh;
+  margin-top: clamp(32px, 5vh, 56px);
+}
+
+/* 100vh, not svh/dvh - same reasoning as the journey stage. */
+.showcaseFrame {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: clip;
+}
+
+/*
+ * One print per project. JS writes exactly two numbers (--p rushing
+ * 1 -> -1 on the SlowMo ease, --lift for the shadow); this rule owns the
+ * whole composition: rise from below the desk, a subtle tilt that
+ * settles flat, a soft shadow that dies as it lands, a quiet up-drift
+ * under the next print (decided mechanic 1).
+ */
+.card {
+  position: absolute;
+  inset: clamp(16px, 4vh, 44px) var(--e-pad)
+    calc(clamp(16px, 4vh, 44px) + 56px);
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  gap: clamp(24px, 4vw, 72px);
+  align-items: center;
+  padding: clamp(20px, 3.5vw, 64px);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  transform: translate3d(
+      0,
+      calc(max(var(--p), 0) * 112% + min(var(--p), 0) * 4%),
+      0
+    )
+    rotate(calc(var(--p) * 2.5deg)) scale(calc(1 + min(var(--p), 0) * 0.03));
+  will-change: transform;
+}
+
+/* Out of its scroll window: stop hinting the compositor. */
+.cardOff {
+  will-change: auto;
+}
+
+.card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow:
+    0 32px 64px -16px rgba(33, 29, 22, 0.22),
+    0 8px 20px -6px rgba(33, 29, 22, 0.12);
+  opacity: var(--lift);
+}
+
+.cardWords {
+  min-width: 0;
+}
+
+.serial {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  font-family: var(--font-plex-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.ticker {
+  color: var(--signal);
+  font-weight: 500;
+}
+
+.cardTitle {
+  margin-top: 18px;
+  font-size: clamp(1.7rem, 3vw, 2.7rem);
+  line-height: 1.12;
+}
+
+.cardTagline {
+  font-family: var(--font-plex-sans), sans-serif;
+  font-size: clamp(1rem, 1.5vw, 1.3rem);
+  color: var(--faint);
+}
+
+.cardMetric {
+  margin-top: 14px;
+  font-family: var(--font-plex-mono), monospace;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: var(--faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.metricValue {
+  color: var(--signal);
+  font-weight: 500;
+  font-size: 15px;
+}
+
+.cardDesc {
+  margin-top: 16px;
+  max-width: 46ch;
+  font-size: 15.5px;
+  line-height: 1.6;
+}
+
+.cardRole {
+  margin-top: 12px;
+  font-family: var(--font-plex-mono), monospace;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--faint);
+}
+
+.cardFoot {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.cardLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-family: var(--font-plex-mono), monospace;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--signal);
+  transition: color 0.15s ease-out;
+}
+
+.cardLink:hover {
+  color: var(--ink);
+}
+
+.awardTag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  background: var(--flare);
+  color: var(--ink);
+  font-family: var(--font-plex-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/*
+ * The BLANK plug-and-play slot: framed wash, sized for a real
+ * screenshot. content-visibility discipline rides the cardOff toggle;
+ * contain-intrinsic-size keeps scroll geometry immovable.
+ */
+.cardPane {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  border: 1px solid var(--line);
+  background: var(--wash);
+  overflow: hidden;
+  contain-intrinsic-size: auto 480px;
+}
+
+.cardOff .cardPane {
+  content-visibility: hidden;
+}
+
+.paneMedia {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.paneBlank {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 10px;
+}
+
+.paneTicker {
+  font-family: var(--font-plex-mono), monospace;
+  font-size: 15px;
+  letter-spacing: 0.24em;
+  color: var(--faint);
+}
+
+/* ---- E.3 - experience ------------------------------------------------------ */
+
+.ledgerWrap {
+  max-width: 780px;
+  margin-top: clamp(36px, 5vh, 56px);
+}
+
+/* ---- E.4 - the honor roll --------------------------------------------------- */
+
+.counterLine {
+  margin-top: clamp(28px, 4vh, 44px);
+  font-family: var(--font-plex-mono), monospace;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.counterNum {
+  font-size: 28px;
+  font-weight: 500;
+  color: var(--signal);
+  font-variant-numeric: tabular-nums;
+  margin-right: 6px;
+}
+
+.roll {
+  margin-top: clamp(24px, 4vh, 40px);
+  list-style: none;
+  padding: 0;
+}
+
+.rollLine {
+  border-bottom: 1px solid var(--line);
+  padding-block: clamp(14px, 2.2vh, 22px);
+}
+
+.rollLine:first-child {
+  border-top: 1px solid var(--line);
+}
+
+.rollClip {
+  display: block;
+  clip-path: inset(-0.12em -0.05em -0.16em -0.05em);
+}
+
+.rollInner {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px clamp(14px, 3vw, 36px);
+}
+
+.rollPlacement {
+  min-width: 4.5ch;
+  font-size: clamp(1.6rem, 4.2vw, 3.4rem);
+  line-height: 1.1;
+  color: var(--signal);
+  font-variant-numeric: tabular-nums;
+  transition: background-color 0.12s ease-out, color 0.12s ease-out;
+}
+
+/* The hover pulse, paper-calibrated: the placement flashes as a flare tag. */
+.rollLine:hover .rollPlacement {
+  background: var(--flare);
+  color: var(--ink);
+}
+
+.rollDetail {
+  flex: 1;
+  min-width: min(100%, 260px);
+  font-size: clamp(1.4rem, 3.4vw, 2.8rem);
+  line-height: 1.14;
+}
+
+.rollMeta {
+  margin-left: auto;
+  font-family: var(--font-plex-mono), monospace;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--faint);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- E.5 - hobbies ----------------------------------------------------------- */
+
+.dump {
+  margin-top: clamp(40px, 6vh, 64px);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: clamp(20px, 4vw, 44px);
+  max-width: 1040px;
+}
+
+/* Loose prints: deterministic tilts (--rot inline), staggered baselines. */
+.dumpSlot {
+  border: 1px solid var(--line);
+  background: var(--paper);
+  padding: 8px;
+  box-shadow: 0 12px 26px -16px rgba(33, 29, 22, 0.22);
+  transform: rotate(var(--rot));
+}
+
+.dumpSlot:nth-child(even) {
+  margin-top: 28px;
+}
+
+.dumpBlank {
+  aspect-ratio: 4 / 3;
+  background: var(--wash);
+  display: grid;
+  place-items: center;
+}
+
+.dumpImg {
+  display: block;
+  aspect-ratio: 4 / 3;
+  width: 100%;
+  object-fit: cover;
+}
+
+.currently {
+  margin-top: clamp(48px, 7vh, 72px);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.currentlyLabel {
+  font-family: var(--font-plex-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--signal);
+}
+
+.currentlyText {
+  font-family: var(--font-plex-mono), monospace;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: var(--faint);
+}
+
+.spark {
+  flex-shrink: 0;
+  color: var(--faint);
+}
+
+/* ---- E.6 - the close ---------------------------------------------------------- */
+
+.closeSection {
+  padding-bottom: clamp(56px, 8vh, 96px);
+}
+
+.closeStatement {
+  margin-top: clamp(40px, 7vh, 72px);
+  max-width: 16ch;
+  font-size: clamp(2.4rem, 7vw, 5.6rem);
+  line-height: 1.06;
+  text-wrap: balance;
+}
+
+.closeClip {
+  display: block;
+  clip-path: inset(-0.15em -0.1em -0.18em -0.1em);
+}
+
+.closeInner {
+  display: block;
+}
+
+.closeCta {
+  margin-top: clamp(40px, 6vh, 64px);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 18px;
+}
+
+.closeSub {
+  font-family: var(--font-plex-mono), monospace;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--faint);
+}
+
+.socials {
+  margin-top: clamp(36px, 5vh, 56px);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 28px;
+  list-style: none;
+  padding: 0;
+}
+
+.socialLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-family: var(--font-plex-mono), monospace;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--faint);
+  transition: color 0.15s ease-out;
+}
+
+.socialLink:hover {
+  color: var(--ink);
+}
+
+/* ---- the breathing CTA (BreathingCta.tsx) -------------------------------------- */
+
+.cta {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 64px;
+  padding: 18px clamp(28px, 4vw, 48px);
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-plex-mono), monospace;
+  font-size: clamp(15px, 1.6vw, 19px);
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: background-color 0.18s ease-out;
+}
+
+.cta:hover {
+  background: var(--flare);
+}
+
+.ctaBreathing {
+  animation: cta-breath 4.2s ease-in-out infinite;
+}
+
+@keyframes cta-breath {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.022);
+  }
+}
+
+/* One-shot hairline ripple on hover/focus - never free-running. */
+.ring {
+  position: absolute;
+  inset: -1px;
+  border: 1px solid var(--flare);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.rippling .ring:nth-child(1) {
+  animation: cta-ring 1.05s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.rippling .ring:nth-child(2) {
+  animation: cta-ring 1.05s cubic-bezier(0.22, 1, 0.36, 1) 0.14s forwards;
+}
+
+.rippling .ring:nth-child(3) {
+  animation: cta-ring 1.05s cubic-bezier(0.22, 1, 0.36, 1) 0.28s forwards;
+}
+
+@keyframes cta-ring {
+  0% {
+    opacity: 0.85;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.35, 1.85);
+  }
+}
+
+/* ---- the endcap ------------------------------------------------------------------ */
+
+.endcap {
+  border-top: 1px solid var(--line);
+  padding-block: 36px calc(88px + env(safe-area-inset-bottom));
+}
+
+.endRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  margin-top: 20px;
+}
+
+/* The binary whisper tape (menu item 9): market-desk archaeology, hover-lit. */
+.tape {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 14px;
+  cursor: default;
+}
+
+.tapeGroup {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.tapeBit {
+  font-family: var(--font-plex-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--line);
+  transition: color 0.16s ease-out;
+}
+
+.tapeBitOn {
+  color: var(--signal);
+}
+
+/* ---- narrow viewports -------------------------------------------------------- */
+
+@media (max-width: 860px) {
+  .whoGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .portrait {
+    justify-self: start;
+  }
+
+  .card {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    align-content: center;
+    gap: 18px;
+    inset: clamp(12px, 2.5vh, 24px) 16px
+      calc(clamp(12px, 2.5vh, 24px) + 54px);
+    padding: clamp(16px, 4vw, 28px);
+  }
+
+  .cardPane {
+    order: 2;
+    aspect-ratio: 16 / 10;
+  }
+
+  .cardWords {
+    order: 1;
+  }
+
+  /* Guarantee the words + pane fit a 390x844 frame. */
+  .cardDesc {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+    overflow: hidden;
+  }
+
+  .cardRole {
+    display: none;
+  }
+}
+
+/* ---- print: the portfolio on actual paper -------------------------------------- */
+
+@media print {
+  .bloom,
+  .glow {
+    display: none;
+  }
+
+  .hero {
+    min-height: auto;
+  }
+
+  .showcaseTrack {
+    height: auto;
+  }
+
+  .showcaseFrame {
+    position: static;
+    height: auto;
+    overflow: visible;
+  }
+
+  .card {
+    position: relative;
+    inset: auto;
+    transform: none !important;
+    break-inside: avoid;
+    margin-bottom: 20px;
+  }
+
+  .card::after {
+    opacity: 0;
+  }
+
+  .rollLine {
+    break-inside: avoid;
+  }
+
+  /* Whatever scroll state was frozen mid-scrub, print the settled page. */
+  .root [data-e-rise],
+  .root [data-e-roll],
+  .root [data-e-slice-a],
+  .root [data-e-slice-b],
+  .root [data-e-flap-rise],
+  .root [data-e-thread],
+  .root [data-e-highlight],
+  .root [data-e-meta-l],
+  .root [data-e-meta-r],
+  .root [data-e-close],
+  .root [data-e-toss],
+  .root .ruleHalfL,
+  .root .ruleHalfR {
+    transform: none !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+}
+
+/* ---- reduced motion: the settled page, statically -------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  /* Motion.tsx builds nothing here; the showcase reads as stacked prints. */
+  .showcaseTrack {
+    height: auto;
+  }
+
+  .showcaseFrame {
+    position: static;
+    height: auto;
+    overflow: visible;
+    display: grid;
+    gap: 24px;
+    padding-inline: var(--e-pad);
+  }
+
+  .card {
+    position: relative;
+    inset: auto;
+    transform: none;
+    will-change: auto;
+  }
+
+  .card::after {
+    opacity: 0;
+  }
+
+  .cardDesc {
+    display: block;
+    -webkit-line-clamp: none;
+    overflow: visible;
+  }
+
+  .cardRole {
+    display: block;
+  }
+
+  .dumpSlot {
+    transform: none;
+  }
+
+  .flapRolling {
+    animation: none;
+  }
+
+  .ctaBreathing {
+    animation: none;
+  }
+
+  .rippling .ring {
+    animation: none;
+  }
+
+  .rollPlacement,
+  .tapeBit,
+  .cardLink,
+  .socialLink,
+  .cta {
+    transition: none;
+  }
+}

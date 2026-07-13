@@ -1,5 +1,5 @@
 import { contact, signOff } from "@/content";
-import TerminalHint from "./TerminalHint";
+import TerminalHint from "@/journey/rungs/e/salvage/TerminalHint";
 
 /* Links still awaiting a real URL (`#todo` in content.ts) are not rendered. */
 const links = [contact.github, contact.linkedin, contact.x, contact.email].filter(

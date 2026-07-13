@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { readCursorWake, subscribeCursorWake } from "../wake";
 
 /*
  * The signature: a custom cursor for hover-capable fine-pointer devices.
@@ -9,12 +10,20 @@ import { useEffect, useRef, useState } from "react";
  * that label ("devpost ↗", "press /", "copy", "~2ms"); over plain
  * links/buttons (`data-cursor-grow` or none) it just grows a little.
  *
+ * Salvaged into rung E (rung-e-pristine.md): the cursor sleeps through
+ * rungs A-D and WAKES as the detonation's final LIFE beat - the wake
+ * store (../wake.ts) is scrubbed by the E.0 entrance timeline, so
+ * scrolling back toward D puts the dot back to sleep and the native
+ * cursor returns. Its first appearance after waking is a small scale-in
+ * pop: arrival as resurrection.
+ *
  * Rules it never breaks:
  * - `(hover: hover) and (pointer: fine)` only - touch and keyboard users
  *   get the native experience, untouched.
  * - Focus outlines are never hidden; this is pointer-only garnish.
- * - Reduced motion: the dot still follows (snap, no lerp trail) and
- *   morphs are instant (transition removed in globals.css).
+ * - Reduced motion: the dot still follows (snap, no lerp trail), morphs
+ *   are instant (transition removed in globals.css), and the birth pop
+ *   is skipped.
  * - Over text fields the dot sleeps and the native I-beam returns.
  * - The pill rides offset to the side of the pointer so it never covers
  *   the words under it.
@@ -32,6 +41,7 @@ type Mode = "dot" | "grow" | "label" | "asleep";
 
 export default function Cursor() {
   const [active, setActive] = useState(false);
+  const [awakeInE, setAwakeInE] = useState(false);
   const pillRef = useRef<HTMLDivElement>(null);
   const labelRef = useRef<HTMLSpanElement>(null);
 
@@ -46,8 +56,17 @@ export default function Cursor() {
     }
   }, []);
 
+  // The resurrection gate: asleep until the E.0 entrance scrubs the wake
+  // store past its midpoint; scrubbing back re-sleeps it (native cursor
+  // returns because the whole system unmounts, dropping the body attr).
   useEffect(() => {
-    if (!active) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setAwakeInE(readCursorWake() >= 0.5);
+    return subscribeCursorWake((value) => setAwakeInE(value >= 0.5));
+  }, []);
+
+  useEffect(() => {
+    if (!active || !awakeInE) return;
 
     const reduced = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
@@ -65,6 +84,7 @@ export default function Cursor() {
     let raf = 0;
     let awake = false;
     let running = false;
+    let birth = 1; // scale ramp for the resurrection pop; set to 0.35 on first appearance
 
     const el = pillRef.current;
     const labelEl = labelRef.current;
@@ -119,6 +139,8 @@ export default function Cursor() {
         document.body.setAttribute("data-cursor-awake", "");
         pos.x = target.x;
         pos.y = target.y;
+        // The resurrection beat: the dot's first appearance blooms in.
+        birth = reduced ? 1 : 0.35;
       }
       if (!visible) {
         visible = true;
@@ -165,7 +187,8 @@ export default function Cursor() {
         window.innerWidth - w - EDGE
       );
       const y = Math.min(pos.y - h / 2, window.innerHeight - h - EDGE);
-      const scale = pressed ? 0.86 : 1;
+      birth += (1 - birth) * 0.14;
+      const scale = (pressed ? 0.86 : 1) * birth;
       el.style.transform = `translate3d(${x}px, ${y}px, 0) scale(${scale})`;
       // Sleep when settled: once the lerp has caught up there is nothing
       // left to animate, so stop re-queueing instead of ticking forever on
@@ -173,11 +196,13 @@ export default function Cursor() {
       if (
         Math.abs(target.x - pos.x) < 0.1 &&
         Math.abs(target.y - pos.y) < 0.1 &&
-        Math.abs(sideGoal - side) < 0.01
+        Math.abs(sideGoal - side) < 0.01 &&
+        Math.abs(1 - birth) < 0.01
       ) {
         pos.x = target.x;
         pos.y = target.y;
         side = sideGoal;
+        birth = 1;
         running = false;
         return;
       }
@@ -211,9 +236,9 @@ export default function Cursor() {
       document.documentElement.removeEventListener("pointerleave", onLeave);
       document.body.removeAttribute("data-cursor-awake");
     };
-  }, [active]);
+  }, [active, awakeInE]);
 
-  if (!active) return null;
+  if (!active || !awakeInE) return null;
 
   return (
     <div ref={pillRef} aria-hidden="true" className="cursor-pill font-mono">
